@@ -23,6 +23,8 @@ app.use((req, res, next) => {
 //routes
 app.use(require('./routes/index.js'));
 app.use('/promotores', require('./routes/promotores.js'));
+app.use('/leads', require('./routes/leads.js'));
+
 
 
 //starting server
