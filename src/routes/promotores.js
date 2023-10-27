@@ -47,7 +47,7 @@ router.post('/update/:id', (req, res) => {
 
     const promotor = { Nombre, Correo, Passw};
 
-    pool.query('UPDATE promotor SET ? WHERE  id = ?', [promotor, id]);
+    pool.query('UPDATE promotor SET ? WHERE  PromotorID = ?', [promotor, id]);
     res.json({
         status: 200,
         message: "Se ha actualizado correctamente",
