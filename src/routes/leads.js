@@ -25,14 +25,23 @@ router.get('/:id', async(req, res) => {
 
 //Crear aqui me quede
 router.post('/create', async(req, res) =>{
-    const {Nombre} = req.body;
-    
+    const {NombreCompleto} = req.body;
+    const {Telefono} = req.body;
+    const {Telefono2} = req.body;
+    const {CorreoElectronico} = req.body;
+    const {CorreoElectronico2} = req.body;
+    const {FechaPrimerContacto} = req.body;
+    const {Edad} = req.body;
+    const {UbicacionID} = req.body;
+    const {PSeguimiento} = req.body;
+    const {CarreraInteresID} = req.body;
+    const {Grado} = req.body;
 
     const lead = {
-        Nombre
+        NombreCompleto
     }
 
-    await pool.query('INSERT INTO lead set ?', [lead]);
+    await pool.query('INSERT INTO leads set ?', [lead]);
     res.json({
         status: 200,
         message: "Se ha registrado correctamente",
