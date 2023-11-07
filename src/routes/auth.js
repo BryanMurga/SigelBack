@@ -27,7 +27,7 @@ router.post('/login', (req, res) => {
             return res.status(401).json({ message: 'Nombre de usuario o contraseña incorrectos' });
         }
 
-        res.json({ message: 'Inicio de sesión exitoso' });
+        res.json({ message: 'Inicio de sesión exitoso', role: user.role });
     });
 });
 
