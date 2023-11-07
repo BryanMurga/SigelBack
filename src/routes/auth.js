@@ -33,7 +33,7 @@ router.post('/login', (req, res) => {
 
 
 router.post('/register', (req, res) => {
-    const { userName, password } = req.body;
+    const { userName, password, role} = req.body;
 
     if (!userName || !password) {
         return res.status(400).send('Debes proporcionar un nombre de usuario y contraseña');
@@ -51,7 +51,7 @@ router.post('/register', (req, res) => {
         }
 
         // Crea un nuevo usuario en la base de datos sin encriptar la contraseña
-        pool.query('INSERT INTO users SET ?', { userName: userName, password: password }, (err, results) => {
+        pool.query('INSERT INTO users SET ?', { userName: userName, password: password, role: role}, (err, results) => {
             if (err) {
                 console.error('Error al registrar el usuario:', err);
                 return res.status(500).json({ message: 'Error en el servidor' });
