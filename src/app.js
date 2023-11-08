@@ -29,6 +29,7 @@ app.use ('/campanas', require('./routes/campana.js'))
 app.use('/carrera-interes', require('./routes/carreraInteres.js'));
 app.use('/contacto', require('./routes/contacto.js'));
 app.use('/auth', require('./routes/auth.js'));
+app.use('/contacto-alumno', require('./routes/contactoAlumno.js'));
 app.use('/alumnos', require('./routes/alumno.js'));
 
 
