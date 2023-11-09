@@ -32,6 +32,7 @@ app.use('/leads', require('./routes/leads.js'));
 app.use('/medio-contacto', require('./routes/medioContacto.js'));
 app.use('/promotores', require('./routes/promotores.js'));
 app.use('/reasignaciones', require('./routes/reasignaciones.js'));
+app.use('/lista-comision', require('./routes/listaComision.js'));
 app.use(require('./routes/index.js'));
 
 
