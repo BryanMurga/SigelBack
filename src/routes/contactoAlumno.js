@@ -2,42 +2,42 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db.js');
 
-// Obtener todos los registros de ContactoAlumno
+// Obtener todos los contactos de alumnos
 router.get('/', async (req, res) => {
   try {
-    const contactosAlumno = await pool.query('SELECT * FROM ContactoAlumno');
+    const listContactoAlumnos = await pool.query('SELECT * FROM ContactoAlumno');
     res.json({
       status: 200,
-      message: 'Se han listado los registros de ContactoAlumno correctamente',
-      contactosAlumno: contactosAlumno,
+      message: 'Se ha listado correctamente',
+      listContactoAlumnos: listContactoAlumnos,
     });
   } catch (error) {
-    console.error('Error al obtener la lista de registros de ContactoAlumno:', error);
+    console.error('Error al obtener la lista de contactos de alumnos:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
 
-// Obtener un registro de ContactoAlumno por su ID
+// Obtener un contacto de alumno por su ID
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
     const contactoAlumno = await pool.query('SELECT * FROM ContactoAlumno WHERE ContactoAlumnoID = ?', [id]);
     if (contactoAlumno.length === 0) {
-      return res.status(404).json({ error: 'Registro de ContactoAlumno no encontrado' });
+      return res.status(404).json({ error: 'Contacto de alumno no encontrado' });
     }
     res.json({
       status: 200,
-      message: 'Se ha obtenido el registro de ContactoAlumno correctamente',
+      message: 'Se ha obtenido el contacto de alumno correctamente',
       contactoAlumno: contactoAlumno[0],
     });
   } catch (error) {
-    console.error('Error al obtener el registro de ContactoAlumno:', error);
+    console.error('Error al obtener el contacto de alumno:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
 
-// Crear un nuevo registro de ContactoAlumno
+// Crear un nuevo contacto de alumno
 router.post('/create', async (req, res) => {
   const { FechaContacto, Comentario } = req.body;
 
@@ -46,18 +46,17 @@ router.post('/create', async (req, res) => {
   }
 
   const query = 'INSERT INTO ContactoAlumno (FechaContacto, Comentario) VALUES (?, ?)';
-  const values = [FechaContacto, Comentario];
 
   try {
-    const result = await pool.query(query, values);
-    res.json({ status: 200, message: 'Registro de ContactoAlumno creado exitosamente', insertedId: result.insertId });
+    const result = await pool.query(query, [FechaContacto, Comentario]);
+    res.json({ status: 200, message: 'Contacto de alumno creado exitosamente', insertedId: result.insertId });
   } catch (error) {
-    console.error('Error al crear el registro de ContactoAlumno:', error);
+    console.error('Error al crear el contacto de alumno:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
 
-// Actualizar la información de un registro de ContactoAlumno por su ID
+// Actualizar la información de un contacto de alumno por su ID
 router.put('/update/:id', async (req, res) => {
   const { id } = req.params;
   const { FechaContacto, Comentario } = req.body;
@@ -67,26 +66,25 @@ router.put('/update/:id', async (req, res) => {
   }
 
   const query = 'UPDATE ContactoAlumno SET FechaContacto = ?, Comentario = ? WHERE ContactoAlumnoID = ?';
-  const values = [FechaContacto, Comentario, id];
 
   try {
-    await pool.query(query, values);
-    res.json({ status: 200, message: 'Registro de ContactoAlumno actualizado exitosamente' });
+    await pool.query(query, [FechaContacto, Comentario, id]);
+    res.json({ status: 200, message: 'Contacto de alumno actualizado exitosamente' });
   } catch (error) {
-    console.error('Error al actualizar el registro de ContactoAlumno:', error);
+    console.error('Error al actualizar el contacto de alumno:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
 
-// Eliminar un registro de ContactoAlumno por su ID
+// Eliminar un contacto de alumno por su ID
 router.delete('/delete/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
     await pool.query('DELETE FROM ContactoAlumno WHERE ContactoAlumnoID = ?', [id]);
-    res.json({ status: 200, message: 'Registro de ContactoAlumno eliminado exitosamente' });
+    res.json({ status: 200, message: 'Contacto de alumno eliminado exitosamente' });
   } catch (error) {
-    console.error('Error al eliminar el registro de ContactoAlumno:', error);
+    console.error('Error al eliminar el contacto de alumno:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });

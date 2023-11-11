@@ -2,14 +2,14 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db.js');
 
-// Listar todos los contactos
+// Obtener todos los contactos
 router.get('/', async (req, res) => {
   try {
-    const contactos = await pool.query('SELECT * FROM Contacto');
+    const listContactos = await pool.query('SELECT * FROM Contacto');
     res.json({
       status: 200,
-      message: 'Listado de contactos',
-      contactos: contactos,
+      message: 'Se ha listado correctamente',
+      listContactos: listContactos,
     });
   } catch (error) {
     console.error('Error al obtener la lista de contactos:', error);
@@ -42,33 +42,33 @@ router.post('/create', async (req, res) => {
   const { FechaContacto, Comentario } = req.body;
 
   if (!FechaContacto || !Comentario) {
-    return res.status(400).json({ error: 'Los campos FechaContacto y Comentario son obligatorios' });
+    return res.status(400).json({ error: 'Todos los campos obligatorios deben estar presentes' });
   }
 
-  const nuevoContacto = { FechaContacto, Comentario };
+  const query = 'INSERT INTO Contacto (FechaContacto, Comentario) VALUES (?, ?)';
 
   try {
-    const result = await pool.query('INSERT INTO Contacto SET ?', [nuevoContacto]);
-    res.json({ status: 200, message: 'Nuevo contacto creado exitosamente', insertedId: result.insertId });
+    const result = await pool.query(query, [FechaContacto, Comentario]);
+    res.json({ status: 200, message: 'Contacto creado exitosamente', insertedId: result.insertId });
   } catch (error) {
     console.error('Error al crear el contacto:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
 
-// Actualizar un contacto por su ID
+// Actualizar la información de un contacto por su ID
 router.put('/update/:id', async (req, res) => {
   const { id } = req.params;
   const { FechaContacto, Comentario } = req.body;
 
   if (!FechaContacto || !Comentario) {
-    return res.status(400).json({ error: 'Los campos FechaContacto y Comentario son obligatorios' });
+    return res.status(400).json({ error: 'Todos los campos obligatorios deben estar presentes' });
   }
 
-  const contactoActualizado = { FechaContacto, Comentario };
+  const query = 'UPDATE Contacto SET FechaContacto = ?, Comentario = ? WHERE ContactoID = ?';
 
   try {
-    await pool.query('UPDATE Contacto SET ? WHERE ContactoID = ?', [contactoActualizado, id]);
+    await pool.query(query, [FechaContacto, Comentario, id]);
     res.json({ status: 200, message: 'Contacto actualizado exitosamente' });
   } catch (error) {
     console.error('Error al actualizar el contacto:', error);

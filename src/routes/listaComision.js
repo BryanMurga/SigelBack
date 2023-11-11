@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db.js');
 
+// Rutas para ListaComision
+
 // Obtener todas las listas de comisión
 router.get('/', async (req, res) => {
   try {
@@ -16,6 +18,7 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
+
 
 // Obtener una lista de comisión por su ID
 router.get('/:id', async (req, res) => {
@@ -36,6 +39,7 @@ router.get('/:id', async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
+
 
 // Crear una nueva lista de comisión
 router.post('/create', async (req, res) => {
@@ -139,5 +143,6 @@ router.delete('/delete/:id', async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
+
 
 module.exports = router;

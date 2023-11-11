@@ -2,17 +2,17 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db.js');
 
-// Listar todas las campañas
+// Obtener todas las campañas
 router.get('/', async (req, res) => {
   try {
-    const campañas = await pool.query('SELECT * FROM Campana');
+    const campanas = await pool.query('SELECT * FROM Campana');
     res.json({
       status: 200,
-      message: 'Listado de campañas',
-      campañas: campañas,
+      message: 'Se han listado las campañas correctamente',
+      campanas: campanas,
     });
   } catch (error) {
-    console.error('Error al obtener la lista de campañas:', error);
+    console.error('Error al obtener las campañas:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
@@ -22,14 +22,14 @@ router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const campaña = await pool.query('SELECT * FROM Campana WHERE CampanaID = ?', [id]);
-    if (campaña.length === 0) {
+    const campana = await pool.query('SELECT * FROM Campana WHERE CampanaID = ?', [id]);
+    if (campana.length === 0) {
       return res.status(404).json({ error: 'Campaña no encontrada' });
     }
     res.json({
       status: 200,
       message: 'Se ha obtenido la campaña correctamente',
-      campaña: campaña[0],
+      campana: campana[0],
     });
   } catch (error) {
     console.error('Error al obtener la campaña:', error);
@@ -45,18 +45,19 @@ router.post('/create', async (req, res) => {
     return res.status(400).json({ error: 'Todos los campos obligatorios deben estar presentes' });
   }
 
-  const nuevaCampana = { TipoCamp, Nombre };
+  const query = 'INSERT INTO Campana (TipoCamp, Nombre) VALUES (?, ?)';
+  const values = [TipoCamp, Nombre];
 
   try {
-    const result = await pool.query('INSERT INTO Campana SET ?', [nuevaCampana]);
-    res.json({ status: 200, message: 'Nueva campaña creada exitosamente', insertedId: result.insertId });
+    const result = await pool.query(query, values);
+    res.json({ status: 200, message: 'Campaña creada exitosamente', insertedId: result.insertId });
   } catch (error) {
     console.error('Error al crear la campaña:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
 
-// Actualizar una campaña por su ID
+// Actualizar la información de una campaña por su ID
 router.put('/update/:id', async (req, res) => {
   const { id } = req.params;
   const { TipoCamp, Nombre } = req.body;
@@ -65,10 +66,11 @@ router.put('/update/:id', async (req, res) => {
     return res.status(400).json({ error: 'Todos los campos obligatorios deben estar presentes' });
   }
 
-  const campañaActualizada = { TipoCamp, Nombre };
+  const query = 'UPDATE Campana SET TipoCamp = ?, Nombre = ? WHERE CampanaID = ?';
+  const values = [TipoCamp, Nombre, id];
 
   try {
-    await pool.query('UPDATE Campana SET ? WHERE CampanaID = ?', [campañaActualizada, id]);
+    await pool.query(query, values);
     res.json({ status: 200, message: 'Campaña actualizada exitosamente' });
   } catch (error) {
     console.error('Error al actualizar la campaña:', error);

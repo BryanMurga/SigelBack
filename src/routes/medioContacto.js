@@ -5,11 +5,11 @@ const pool = require('../db.js');
 // Obtener todos los medios de contacto
 router.get('/', async (req, res) => {
   try {
-    const mediosDeContacto = await pool.query('SELECT * FROM MedioDeContacto');
+    const listMediosDeContacto = await pool.query('SELECT * FROM MedioDeContacto');
     res.json({
       status: 200,
-      message: 'Se han listado los medios de contacto correctamente',
-      mediosDeContacto: mediosDeContacto,
+      message: 'Se ha listado correctamente',
+      listMediosDeContacto: listMediosDeContacto,
     });
   } catch (error) {
     console.error('Error al obtener la lista de medios de contacto:', error);
@@ -42,14 +42,13 @@ router.post('/create', async (req, res) => {
   const { Nombre } = req.body;
 
   if (!Nombre) {
-    return res.status(400).json({ error: 'El campo Nombre es obligatorio' });
+    return res.status(400).json({ error: 'Todos los campos obligatorios deben estar presentes' });
   }
 
   const query = 'INSERT INTO MedioDeContacto (Nombre) VALUES (?)';
-  const values = [Nombre];
 
   try {
-    const result = await pool.query(query, values);
+    const result = await pool.query(query, [Nombre]);
     res.json({ status: 200, message: 'Medio de contacto creado exitosamente', insertedId: result.insertId });
   } catch (error) {
     console.error('Error al crear el medio de contacto:', error);
@@ -63,14 +62,13 @@ router.put('/update/:id', async (req, res) => {
   const { Nombre } = req.body;
 
   if (!Nombre) {
-    return res.status(400).json({ error: 'El campo Nombre es obligatorio' });
+    return res.status(400).json({ error: 'Todos los campos obligatorios deben estar presentes' });
   }
 
   const query = 'UPDATE MedioDeContacto SET Nombre = ? WHERE MedioID = ?';
-  const values = [Nombre, id];
 
   try {
-    await pool.query(query, values);
+    await pool.query(query, [Nombre, id]);
     res.json({ status: 200, message: 'Medio de contacto actualizado exitosamente' });
   } catch (error) {
     console.error('Error al actualizar el medio de contacto:', error);

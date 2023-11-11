@@ -5,11 +5,11 @@ const pool = require('../db.js');
 // Obtener todas las reasignaciones
 router.get('/', async (req, res) => {
   try {
-    const reasignaciones = await pool.query('SELECT * FROM Reasignaciones');
+    const listReasignaciones = await pool.query('SELECT * FROM Reasignaciones');
     res.json({
       status: 200,
-      message: 'Se han listado las reasignaciones correctamente',
-      reasignaciones: reasignaciones,
+      message: 'Se ha listado correctamente',
+      listReasignaciones: listReasignaciones,
     });
   } catch (error) {
     console.error('Error al obtener la lista de reasignaciones:', error);
@@ -46,10 +46,9 @@ router.post('/create', async (req, res) => {
   }
 
   const query = 'INSERT INTO Reasignaciones (LeadID, PromotorAnterior, PromotorNuevo, FechaReasignacion) VALUES (?, ?, ?, ?)';
-  const values = [LeadID, PromotorAnterior, PromotorNuevo, FechaReasignacion];
 
   try {
-    const result = await pool.query(query, values);
+    const result = await pool.query(query, [LeadID, PromotorAnterior, PromotorNuevo, FechaReasignacion]);
     res.json({ status: 200, message: 'Reasignación creada exitosamente', insertedId: result.insertId });
   } catch (error) {
     console.error('Error al crear la reasignación:', error);
@@ -67,10 +66,9 @@ router.put('/update/:id', async (req, res) => {
   }
 
   const query = 'UPDATE Reasignaciones SET LeadID = ?, PromotorAnterior = ?, PromotorNuevo = ?, FechaReasignacion = ? WHERE ReasignacionID = ?';
-  const values = [LeadID, PromotorAnterior, PromotorNuevo, FechaReasignacion, id];
 
   try {
-    await pool.query(query, values);
+    await pool.query(query, [LeadID, PromotorAnterior, PromotorNuevo, FechaReasignacion, id]);
     res.json({ status: 200, message: 'Reasignación actualizada exitosamente' });
   } catch (error) {
     console.error('Error al actualizar la reasignación:', error);

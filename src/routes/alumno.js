@@ -5,14 +5,14 @@ const pool = require('../db.js');
 // Obtener todos los alumnos
 router.get('/', async (req, res) => {
   try {
-    const alumnos = await pool.query('SELECT * FROM alumnos');
+    const alumnos = await pool.query('SELECT * FROM Alumnos');
     res.json({
       status: 200,
       message: 'Se han listado los alumnos correctamente',
       alumnos: alumnos,
     });
   } catch (error) {
-    console.error('Error al obtener la lista de alumnos:', error);
+    console.error('Error al obtener los alumnos:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
@@ -39,20 +39,32 @@ router.get('/:id', async (req, res) => {
 
 // Crear un nuevo alumno
 router.post('/create', async (req, res) => {
-  const { Nombre, Telefono, EscuelaProcedencia, NombrePromotor, Estatus, Procedencia, TipoBaja, RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwiter, RSWhatsapp, RSOtro } = req.body;
+  // Desestructurar los campos del cuerpo de la solicitud
+  const { LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja,
+    RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwitter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional } = req.body;
 
-  if (!Nombre || !Telefono || !EscuelaProcedencia || !NombrePromotor || !Estatus) {
-    return res.status(400).json({ error: 'Todos los campos obligatorios deben estar presentes' });
+  // Validar campos obligatorios
+  if (!LeadID || !Nombre) {
+    return res.status(400).json({ error: 'LeadID y Nombre son campos obligatorios' });
   }
 
-  const query = 'INSERT INTO Alumnos (Nombre, Telefono, EscuelaProcedencia, NombrePromotor, Estatus, Procedencia, TipoBaja, RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwiter, RSWhatsapp, RSOtro) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+  // Construir la consulta SQL y los valores
+  const query = `INSERT INTO Alumnos
+    (LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja,
+    RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwitter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-  const values = [Nombre, Telefono, EscuelaProcedencia, NombrePromotor, Estatus, Procedencia, TipoBaja, RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwiter, RSWhatsapp, RSOtro];
+  const values = [LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja,
+    RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwitter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional];
 
   try {
+    // Ejecutar la consulta y obtener el resultado
     const result = await pool.query(query, values);
+
+    // Enviar una respuesta JSON con el resultado
     res.json({ status: 200, message: 'Alumno creado exitosamente', insertedId: result.insertId });
   } catch (error) {
+    // Manejar errores y enviar una respuesta de error
     console.error('Error al crear el alumno:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
@@ -60,37 +72,57 @@ router.post('/create', async (req, res) => {
 
 // Actualizar la información de un alumno por su ID
 router.put('/update/:id', async (req, res) => {
+  // Obtener el ID del alumno desde los parámetros de la solicitud
   const { id } = req.params;
-  const { Nombre, Telefono, EscuelaProcedencia, NombrePromotor, Estatus, Procedencia, TipoBaja, RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwiter, RSWhatsapp, RSOtro } = req.body;
 
-//   if (!Nombre || !Telefono || !EscuelaProcedencia || !NombrePromotor || !Estatus) {
-//     return res.status(400).json({ error: 'Todos los campos obligatorios deben estar presentes' });
-//   }
+  // Desestructurar los campos del cuerpo de la solicitud
+  const { LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja,
+    RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwitter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional } = req.body;
 
-  const query = 'UPDATE Alumnos SET Nombre = ?, Telefono = ?, EscuelaProcedencia = ?, NombrePromotor = ?, Estatus = ?, Procedencia = ?, TipoBaja = ?, RSFacebook = ?, RSInstagram = ?, RSTiktok = ?, RSLinkedln = ?, RSTwiter = ?, RSWhatsapp = ?, RSOtro = ? WHERE AlumnoID = ?';
+  // Validar campos obligatorios
+  if (!LeadID || !Nombre) {
+    return res.status(400).json({ error: 'LeadID y Nombre son campos obligatorios' });
+  }
 
-  const values = [Nombre, Telefono, EscuelaProcedencia, NombrePromotor, Estatus, Procedencia, TipoBaja, RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwiter, RSWhatsapp, RSOtro, id];
+  // Construir la consulta SQL y los valores
+  const query = `UPDATE Alumnos SET
+    LeadID = ?, Nombre = ?, Telefono = ?, EscuelaProcedencia = ?, PromotorID = ?, NoRecibo = ?, Matricula = ?, CarreraInscripcion = ?,
+    Procedencia = ?, TipoBaja = ?, RSFacebook = ?, RSInstagram = ?, RSTiktok = ?, RSLinkedln = ?, RSTwitter = ?, RSWhatsapp = ?, RSOtro = ?,
+    ContactoID = ?, Estatus = ?, FechaBaja = ?, CorreoInstitucional = ?
+    WHERE AlumnoID = ?`;
+
+  const values = [LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja,
+    RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwitter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional, id];
 
   try {
+    // Ejecutar la consulta
     await pool.query(query, values);
+
+    // Enviar una respuesta JSON
     res.json({ status: 200, message: 'Alumno actualizado exitosamente' });
   } catch (error) {
+    // Manejar errores y enviar una respuesta de error
     console.error('Error al actualizar el alumno:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
 
 // Eliminar un alumno por su ID
-// router.delete('/alumnos/:alumnoId', async (req, res) => {
-//   const { alumnoId } = req.params;
+router.delete('/delete/:id', async (req, res) => {
+  // Obtener el ID del alumno desde los parámetros de la solicitud
+  const { id } = req.params;
 
-//   try {
-//     await pool.query('DELETE FROM Alumnos WHERE AlumnoID = ?', [alumnoId]);
-//     res.json({ status: 200, message: 'Alumno eliminado exitosamente' });
-//   } catch (error) {
-//     console.error('Error al eliminar el alumno:', error);
-//     res.status(500).json({ error: 'Error en el servidor' });
-//   }
-// });
+  try {
+    // Ejecutar la consulta de eliminación
+    await pool.query('DELETE FROM Alumnos WHERE AlumnoID = ?', [id]);
+
+    // Enviar una respuesta JSON
+    res.json({ status: 200, message: 'Alumno eliminado exitosamente' });
+  } catch (error) {
+    // Manejar errores y enviar una respuesta de error
+    console.error('Error al eliminar el alumno:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
 
 module.exports = router;

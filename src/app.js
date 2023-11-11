@@ -22,8 +22,6 @@ app.use((req, res, next) => {
 
 //routes
 app.use ('/campanas', require('./routes/campana.js'))
-app.use('/alumnos', require('./routes/alumno.js'));
-app.use('/alumnos', require('./routes/alumno.js'));
 app.use('/auth', require('./routes/auth.js'));
 app.use('/carrera-interes', require('./routes/carreraInteres.js'));
 app.use('/contacto-alumno', require('./routes/contactoAlumno.js'));
@@ -33,6 +31,7 @@ app.use('/medio-contacto', require('./routes/medioContacto.js'));
 app.use('/promotores', require('./routes/promotores.js'));
 app.use('/reasignaciones', require('./routes/reasignaciones.js'));
 app.use('/lista-comision', require('./routes/listaComision.js'));
+app.use('/alumno', require('./routes/alumno.js'));
 app.use(require('./routes/index.js'));
 
 
