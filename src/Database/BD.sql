@@ -220,6 +220,45 @@ ADD FOREIGN KEY (PromotorNuevo) REFERENCES Promotor(PromotorID);
 ALTER TABLE Leads
 ADD FOREIGN KEY (Contacto) REFERENCES Contacto(ContactoID);
 
+<<<<<<< HEAD
+=======
+
+-- mis insert
+#contactoAlumno
+INSERT INTO `contactoalumno` (`ContactoAlumnoID`, `FechaContacto`, `Comentario`) 
+VALUES 
+(NULL, '2023-11-02', 'Se realizo un seguimiento de inscripción con el alumno');
+INSERT INTO `contactoalumno` (`ContactoAlumnoID`, `FechaContacto`, `Comentario`) 
+VALUES 
+(NULL, '2023-11-03', 'se concluyo la inscripción');
+
+-- New Insert
+#campana
+INSERT INTO `campana` (`CampanaID`, `TipoCamp`, `Nombre`) VALUES (NULL, 'Beca especial', 'GENERACIÓN DE OPORTUNIDADES DE VENTA');
+INSERT INTO `campana` (`CampanaID`, `TipoCamp`, `Nombre`) VALUES (NULL, 'EQUIVALENCIAS', 'GENERACIÓN DE OPORTUNIDADES DE VENTA');
+
+#carrerainteres
+INSERT INTO `carrerainteres` (`CarreraID`, `Nombre`) VALUES (NULL, 'INGENIERIA MECATRONICA');
+INSERT INTO `carrerainteres` (`CarreraID`, `Nombre`) VALUES (NULL, 'ADMINISTRACION DE NEGOCIOS INTERNACIONALES');
+
+#mediocontacto
+INSERT INTO `mediodecontacto` (`MedioID`, `Nombre`) VALUES (NULL, 'BARRIDO BASE');
+INSERT INTO `mediodecontacto` (`MedioID`, `Nombre`) VALUES (NULL, 'LANDING CARRERAS');
+
+#promotor
+INSERT INTO `promotor` (`PromotorID`, `Nombre`, `Correo`, `Passw`, `Telefono`) VALUES (NULL, 'ximena', 'ximena@correo.com', '123456', '777852632');
+INSERT INTO `promotor` (`PromotorID`, `Nombre`, `Correo`, `Passw`, `Telefono`) VALUES (NULL, 'Yanin', 'yanin@correo.com', '123456', '77458623');
+
+#leads
+INSERT INTO `leads` (`LeadID`, `NombreCompleto`, `Telefono`, `Telefono2`, `CorreoElectronico`, `CorreoElectronico2`, `FechaPrimerContacto`, `FechaNac`, `EscuelaProcedencia`, `NombrePais`, `NombreEstado`, `NombreCiudad`, `PSeguimiento`, `CarreraInteresID`, `Grado`, `Programa`, `EstatusInsc`, `SemestreIngreso`, `Ciclo`, `CampanaID`, `IsOrganic`, `MedioDeContactoID`, `TipoReferido`, `NombreReferido`, `DondeObtDato`, `FechaInscripcion`, `BecaOfrecida`, `NumeroLista`, `PromotorOriginal`, `NombrePromOrigi`, `FechaPromotorOriginal`, `PromotorActual`, `NombrePromAct`, `FechaPromotorActual`, `Comentarios`, `Contacto`) 
+VALUES (NULL, 'JOHAN ANTONIO FIGUEROA FITZ', '7341282632', NULL, 'JOHANFIGUEROA2022@GMAIL.COM', NULL, '2023-05-18', '2001-05-11', 'CBTIS', 'Mexico', 'Morelos', 'Cuernavaca', 'AU-ALUMNO UNINTER', '1', 'LIC/ING', 'Mecatrónica (IME)', 'INS', '6 Semestre', '2023-2024', '1', 'PAUTA', '1', 'PERSONAL UNINTER', 'Hugo Mariaca', 'B_PERSONAL', '2023-06-19', '40', '406', '1', 'Ximena', '2023-06-16', NULL, NULL, NULL, 'Contesto llamda', NULL);
+INSERT INTO `leads` (`LeadID`, `NombreCompleto`, `Telefono`, `Telefono2`, `CorreoElectronico`, `CorreoElectronico2`, `FechaPrimerContacto`, `FechaNac`, `EscuelaProcedencia`, `NombrePais`, `NombreEstado`, `NombreCiudad`, `PSeguimiento`, `CarreraInteresID`, `Grado`, `Programa`, `EstatusInsc`, `SemestreIngreso`, `Ciclo`, `CampanaID`, `IsOrganic`, `MedioDeContactoID`, `TipoReferido`, `NombreReferido`, `DondeObtDato`, `FechaInscripcion`, `BecaOfrecida`, `NumeroLista`, `PromotorOriginal`, `NombrePromOrigi`, `FechaPromotorOriginal`, `PromotorActual`, `NombrePromAct`, `FechaPromotorActual`, `Comentarios`, `Contacto`) 
+VALUES (NULL, 'Mariana Lopez', '5551234567', NULL, 'mariana@email.com', NULL, '2023-11-20', '2001-11-20', 'CBTIS', 'Mexico', 'Morelos', 'Cuernavaca', 'AU-ALUMNO UNINTER', '1', 'LIC/ING', 'Mecatrónica (IME)', 'INS', '6 Semestre', '2023-2024', '1', 'PAUTA', '1', 'PERSONAL UNINTER', 'Hugo Mariaca', 'B_PERSONAL', '2023-06-19', '40', '406', '1', 'Ximena', '2023-11-20', NULL, NULL, NULL, 'Contesto llamda', NULL);
+
+#reasignaciones
+INSERT INTO `reasignaciones` (`ReasignacionID`, `LeadID`, `PromotorAnterior`, `PromotorNuevo`, `FechaReasignacion`) VALUES (NULL, '1', '1', '2', '2023-11-16 14:33:50');
+
+>>>>>>> 2912762975087844683094117fc4807227ed21b4
 -- Consultas a tablas
 
 -- Inserts para la tabla "Promotor"
@@ -410,6 +449,7 @@ UPDATE leads SET EstatusInsc = 'INSC' WHERE LeadID= 3;
 //
 DELIMITER ;
 
+<<<<<<< HEAD
 -- Continuación del script
 
 -- Consulta para obtener la cantidad de registros por mes
@@ -420,3 +460,16 @@ SELECT * FROM leadxmes_promotor;
 
 -- Fin del script
 
+=======
+DELIMITER //
+CREATE TRIGGER insert_users
+AFTER INSERT ON promotor
+FOR EACH ROW
+BEGIN
+     INSERT INTO users (userName, email, password, role)
+    VALUES (NEW.Nombre, NEW.Correo , NEW.Passw, 'promotor')
+    ON DUPLICATE KEY UPDATE userName = NEW.Nombre, email = NEW.Correo, password = NEW.Passw;
+END;
+//
+DELIMITER ;
+>>>>>>> 2912762975087844683094117fc4807227ed21b4
