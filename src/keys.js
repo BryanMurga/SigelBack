@@ -4,6 +4,6 @@ module.exports = {
         host: "localhost",
         user: "root",
         password: "",
-        database: "APIS3"
+        database: "APIS4"
     }
 };
