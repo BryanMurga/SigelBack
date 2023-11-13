@@ -7,7 +7,7 @@ CREATE TABLE Promotor (
     PromotorID INT AUTO_INCREMENT PRIMARY KEY,
     Nombre VARCHAR(255),
     Correo VARCHAR(255),
-    Salt VARCHAR(255),
+    Passw VARCHAR(255),
    -- HashedPassword VARCHAR(255),
     Telefono varchar(20),
     Estado BOOLEAN DEFAULT TRUE NOT NULL
