@@ -7,7 +7,7 @@ CREATE TABLE Promotor (
     PromotorID INT AUTO_INCREMENT PRIMARY KEY,
     Nombre VARCHAR(255),
     Correo VARCHAR(255),
-    Salt VARCHAR(255),
+    Passw VARCHAR(255),
    -- HashedPassword VARCHAR(255),
     Telefono varchar(20),
     Estado BOOLEAN DEFAULT TRUE NOT NULL
@@ -220,95 +220,6 @@ ADD FOREIGN KEY (PromotorNuevo) REFERENCES Promotor(PromotorID);
 ALTER TABLE Leads
 ADD FOREIGN KEY (Contacto) REFERENCES Contacto(ContactoID);
 
-
--- mis insert
-#contactoAlumno
-INSERT INTO `contactoalumno` (`ContactoAlumnoID`, `FechaContacto`, `Comentario`) 
-VALUES 
-(NULL, '2023-11-02', 'Se realizo un seguimiento de inscripción con el alumno');
-INSERT INTO `contactoalumno` (`ContactoAlumnoID`, `FechaContacto`, `Comentario`) 
-VALUES 
-(NULL, '2023-11-03', 'se concluyo la inscripción');
-
--- New Insert
-#campana
-INSERT INTO `campana` (`CampanaID`, `TipoCamp`, `Nombre`) VALUES (NULL, 'Beca especial', 'GENERACIÓN DE OPORTUNIDADES DE VENTA');
-INSERT INTO `campana` (`CampanaID`, `TipoCamp`, `Nombre`) VALUES (NULL, 'EQUIVALENCIAS', 'GENERACIÓN DE OPORTUNIDADES DE VENTA');
-
-#carrerainteres
-INSERT INTO `carrerainteres` (`CarreraID`, `Nombre`) VALUES (NULL, 'INGENIERIA MECATRONICA');
-INSERT INTO `carrerainteres` (`CarreraID`, `Nombre`) VALUES (NULL, 'ADMINISTRACION DE NEGOCIOS INTERNACIONALES');
-
-#mediocontacto
-INSERT INTO `mediodecontacto` (`MedioID`, `Nombre`) VALUES (NULL, 'BARRIDO BASE');
-INSERT INTO `mediodecontacto` (`MedioID`, `Nombre`) VALUES (NULL, 'LANDING CARRERAS');
-
-#promotor
-INSERT INTO `promotor` (`PromotorID`, `Nombre`, `Correo`, `Passw`, `Telefono`) VALUES (NULL, 'ximena', 'ximena@correo.com', '123456', '777852632');
-INSERT INTO `promotor` (`PromotorID`, `Nombre`, `Correo`, `Passw`, `Telefono`) VALUES (NULL, 'Yanin', 'yanin@correo.com', '123456', '77458623');
-
-#leads
-INSERT INTO `leads` (`LeadID`, `NombreCompleto`, `Telefono`, `Telefono2`, `CorreoElectronico`, `CorreoElectronico2`, `FechaPrimerContacto`, `FechaNac`, `EscuelaProcedencia`, `NombrePais`, `NombreEstado`, `NombreCiudad`, `PSeguimiento`, `CarreraInteresID`, `Grado`, `Programa`, `EstatusInsc`, `SemestreIngreso`, `Ciclo`, `CampanaID`, `IsOrganic`, `MedioDeContactoID`, `TipoReferido`, `NombreReferido`, `DondeObtDato`, `FechaInscripcion`, `BecaOfrecida`, `NumeroLista`, `PromotorOriginal`, `NombrePromOrigi`, `FechaPromotorOriginal`, `PromotorActual`, `NombrePromAct`, `FechaPromotorActual`, `Comentarios`, `Contacto`) 
-VALUES (NULL, 'JOHAN ANTONIO FIGUEROA FITZ', '7341282632', NULL, 'JOHANFIGUEROA2022@GMAIL.COM', NULL, '2023-05-18', '2001-05-11', 'CBTIS', 'Mexico', 'Morelos', 'Cuernavaca', 'AU-ALUMNO UNINTER', '1', 'LIC/ING', 'Mecatrónica (IME)', 'INS', '6 Semestre', '2023-2024', '1', 'PAUTA', '1', 'PERSONAL UNINTER', 'Hugo Mariaca', 'B_PERSONAL', '2023-06-19', '40', '406', '1', 'Ximena', '2023-06-16', NULL, NULL, NULL, 'Contesto llamda', NULL);
-INSERT INTO `leads` (`LeadID`, `NombreCompleto`, `Telefono`, `Telefono2`, `CorreoElectronico`, `CorreoElectronico2`, `FechaPrimerContacto`, `FechaNac`, `EscuelaProcedencia`, `NombrePais`, `NombreEstado`, `NombreCiudad`, `PSeguimiento`, `CarreraInteresID`, `Grado`, `Programa`, `EstatusInsc`, `SemestreIngreso`, `Ciclo`, `CampanaID`, `IsOrganic`, `MedioDeContactoID`, `TipoReferido`, `NombreReferido`, `DondeObtDato`, `FechaInscripcion`, `BecaOfrecida`, `NumeroLista`, `PromotorOriginal`, `NombrePromOrigi`, `FechaPromotorOriginal`, `PromotorActual`, `NombrePromAct`, `FechaPromotorActual`, `Comentarios`, `Contacto`) 
-VALUES (NULL, 'Mariana Lopez', '5551234567', NULL, 'mariana@email.com', NULL, '2023-11-20', '2001-11-20', 'CBTIS', 'Mexico', 'Morelos', 'Cuernavaca', 'AU-ALUMNO UNINTER', '1', 'LIC/ING', 'Mecatrónica (IME)', 'INS', '6 Semestre', '2023-2024', '1', 'PAUTA', '1', 'PERSONAL UNINTER', 'Hugo Mariaca', 'B_PERSONAL', '2023-06-19', '40', '406', '1', 'Ximena', '2023-11-20', NULL, NULL, NULL, 'Contesto llamda', NULL);
-
-#reasignaciones
-INSERT INTO `reasignaciones` (`ReasignacionID`, `LeadID`, `PromotorAnterior`, `PromotorNuevo`, `FechaReasignacion`) VALUES (NULL, '1', '1', '2', '2023-11-16 14:33:50');
-
--- Consultas a tablas
-
--- Inserts para la tabla "Promotor"
-
-INSERT INTO Promotor (Nombre, Correo, HashedPassword, Telefono, Estado)
-VALUES ('Juan Perez', 'juan@example.com', 'hashed_password', '123456789', TRUE);
-
--- Inserts para la tabla "Campana"
-INSERT INTO Campana (TipoCamp, Nombre)
-VALUES ('Publicitaria', 'Campaña de Verano');
-
--- Inserts para la tabla "CarreraInteres"
-INSERT INTO CarreraInteres (Nombre)
-VALUES ('Licenciatura en Psicología'),
-       ('Licenciatura en Derecho'),
-       ('Licenciatura en Ingeniería Informática');
-
--- Inserts para la tabla "Contacto"
-INSERT INTO Contacto (FechaContacto, Comentario)
-VALUES ('2023-02-15', 'Llamada de seguimiento');
-
--- Inserts para la tabla "MedioDeContacto"
-INSERT INTO MedioDeContacto (Nombre)
-VALUES ('Llamada telefónica'),
-       ('Correo electrónico'),
-       ('Redes sociales');
-
--- Inserts para la tabla "Leads"
--- Inserts para la tabla "Leads"
-INSERT INTO `leads` (`LeadID`, `NombreCompleto`, `Telefono`, `Telefono2`, `CorreoElectronico`, `CorreoElectronico2`, `FechaPrimerContacto`, `FechaNac`, `EscuelaProcedencia`, `NombrePais`, `NombreEstado`, `NombreCiudad`, `PSeguimiento`, `CarreraInteresID`, `Grado`, `EstatusInsc`, `SemestreIngreso`, `Ciclo`, `CampanaID`, `IsOrganic`, `MedioDeContactoID`, `TipoReferido`, `NombreReferido`, `DondeObtDato`, `FechaInscripcion`, `BecaOfrecida`, `NumeroLista`, `PromotorOriginal`, `FechaPromotorOriginal`, `PromotorActual`, `FechaPromotorActual`, `Comentarios`, `Contacto`) 
-VALUES (NULL, 'Laura Rodriguez', '987654321', NULL, 'laura@example.com', NULL, '2023-11-01', '2014-01-01', 'Preparatoria XYZ', 'México', 'Jalisco', 'Guadalajara', 'PS-SEGUIMIENTO', '3', 'LIC/ING', 'INSO', '3 Semestre', '2024-1', '1', 'ORGÁNICO', '1', 'ESTUDIANTE', 'Alex Milan', 'B_PERSONAL', NULL, '15', '404', '1', '2023-11-01', '1', '2023-10-11', 'No responde', '1');
-
-INSERT INTO `leads` (`LeadID`, `NombreCompleto`, `Telefono`, `Telefono2`, `CorreoElectronico`, `CorreoElectronico2`, `FechaPrimerContacto`, `FechaNac`, `EscuelaProcedencia`, `NombrePais`, `NombreEstado`, `NombreCiudad`, `PSeguimiento`, `CarreraInteresID`, `Grado`, `EstatusInsc`, `SemestreIngreso`, `Ciclo`, `CampanaID`, `IsOrganic`, `MedioDeContactoID`, `TipoReferido`, `NombreReferido`, `DondeObtDato`, `FechaInscripcion`, `BecaOfrecida`, `NumeroLista`, `PromotorOriginal`, `FechaPromotorOriginal`, `PromotorActual`, `FechaPromotorActual`, `Comentarios`, `Contacto`) 
-VALUES (NULL, 'Mario Rodriguez', '123456789', NULL, 'Mario@example.com', NULL, '2023-10-01', '2013-01-01', 'Preparatoria ZXY', 'México', 'Morelos', 'Cuernavaca', 'PS-SEGUIMIENTO', '3', 'LIC/ING', 'INSC', '3 Semestre', '2024-1', '1', 'ORGÁNICO', '1', 'ESTUDIANTE', 'Alex Milan', 'B_PERSONAL', NULL, '15', '404', '1', '2023-11-01', '1', '2023-10-11', 'No responde', '1');
-
-
--- Inserts para la tabla "Reasignaciones"
-INSERT INTO Reasignaciones (LeadID, PromotorAnterior, PromotorNuevo, FechaReasignacion)
-VALUES (1, 1, 1, '2023-02-10');
-
--- Inserts para la tabla "Alumnos"
--- INSERT INTO Alumnos (LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja, RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwiter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional)
--- VALUES (2, 'Carlos García', '987654321', 'Preparatoria ABC', 1, 'REC-123', 'MAT-456', 'Licenciatura en Psicología', 'Local', 'Temporal', 'facebook.com/carlos', 'instagram.com/carlos', 'tiktok.com/carlos', 'linkedin.com/in/carlos', 'twitter.com/carlos', 987654321, 'Otro perfil social', 1, 'INSC', NULL, 'carlos@example.com');
-
--- Inserts para la tabla "ListaComision"
--- INSERT INTO ListaComision (PromotorID, FechaInscripcionAlumno, AlumnoID, Status, CicloEscolar, ProgramaID, SemestreIngreso, Matricula, NoRecibo, PorcentajeBeca, TotalComision, EscuelaProcedencia, Escuela, Pais, Estado, Municipio, MedioDeContactoID, CanalDeVenta, EsReferido, PromocionInscripcion, NumTelefonicoAlumno, CorreoElectronicoProspecto, FechaNacimientoProspecto)
--- VALUES (1, '2023-01-15', 1, 'INSC', '2023A', 1, '1 Semestre', 'MAT-789', 'REC-321', '10%', 5000.00, 'Preparatoria ABC', 'PRIVADA', 'México', 'Jalisco', 'Guadalajara', 1, 'FACEBOOK', 'NINGUNO', 'FLASH PASS', '9876543210', 'carlos_prospecto@example.com', '2000-01-20');
-
--- Inserts para la tabla "users"
-INSERT INTO users (userName, password, role)
-VALUES ('admin1', 'admin1_password', 'admin'),
-       ('promotor1', 'promotor1_password', 'promotor');
-
 -- Consulta del nombre de los promotores Actual
 SELECT 
     P.nombre as NombrePromotor
@@ -354,7 +265,7 @@ CREATE TABLE leadxmes (
 CREATE TABLE leadxmes_promotor (
     mes INT,
     anio INT,
-    nombrePromotor VARCHAR(255),
+    nombrePromotor INT,
     cantidad_registros INT
 );
 
@@ -393,10 +304,10 @@ BEGIN
     DECLARE promotor_insert VARCHAR(255);
     SET mes_insert = MONTH(NEW.FechaPrimerContacto); -- Suponiendo que tienes una columna llamada "fecha" en tu tabla
     SET anio_insert = YEAR(NEW.FechaPrimerContacto);
-    SET promotor_insert = NEW.NombrePromAct;
+    SET promotor_insert = NEW.PromotorActual;
 
     -- Verificar si ya existe un registro para el mes y año actual
-    IF EXISTS (SELECT * FROM leadxmes_promotor WHERE mes = mes_insert AND anio = anio_insert AND nombrePromotor =  promotor_insert ) THEN
+    IF EXISTS (SELECT * FROM leadxmes_promotor WHERE mes = mes_insert AND anio = anio_insert AND promotorActual =  promotor_insert ) THEN
         -- Actualizar el conteo
         UPDATE leadxmes_promotor
         SET cantidad_registros = cantidad_registros + 1
