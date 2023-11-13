@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS APIS3;
-CREATE DATABASE APIS3;
-USE APIS3;
+DROP DATABASE IF EXISTS APIS4;
+CREATE DATABASE APIS4;
+USE APIS4;
 
 -- Crear la tabla "Promotor"
 CREATE TABLE Promotor (
@@ -8,10 +8,52 @@ CREATE TABLE Promotor (
     Nombre VARCHAR(255),
     Correo VARCHAR(255),
     Passw VARCHAR(255),
-   -- HashedPassword VARCHAR(255),
     Telefono varchar(20),
     Estado BOOLEAN DEFAULT TRUE NOT NULL
 );
+
+-- Crear la tabla "Campana"
+CREATE TABLE Campana (
+    CampanaID INT AUTO_INCREMENT PRIMARY KEY,
+    TipoCamp VARCHAR(255),
+    Nombre VARCHAR(255)
+);
+
+-- Crear la tabla "Contacto"
+CREATE TABLE Contacto (
+    ContactoID INT AUTO_INCREMENT PRIMARY KEY,
+    FechaContacto DATE,
+    Comentario VARCHAR(255)
+);
+
+-- Crear la tabla "MedioDeContacto"
+CREATE TABLE MedioDeContacto (
+    MedioID INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre CHAR(255)
+);
+
+-- Crear la tabla "ContactoAlumno"
+CREATE TABLE ContactoAlumno(
+    ContactoAlumnoID INT PRIMARY KEY AUTO_INCREMENT,
+    FechaContacto DATE,
+    Comentario VARCHAR(255)
+);
+
+-- Crear la tabla "Carreras"
+CREATE TABLE Carreras (
+    CarreraID INT AUTO_INCREMENT PRIMARY KEY,
+    Nombre VARCHAR(255)
+);
+
+-- Crear la tabla "users"
+CREATE TABLE users(
+    idUser INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    userName VARCHAR(30) NOT NULL,
+    email VARCHAR(30),
+    password VARCHAR(30) NOT NULL,
+    role ENUM('admin','promotor','coordinador')
+);
+
 
 -- Crear la tabla "Leads"
 CREATE TABLE Leads (
@@ -48,7 +90,7 @@ CREATE TABLE Leads (
                       'REDES SOCIALES META INSTAGRAM', 'LANDING', 'LANDING CARRERAS', 'LANDING FORMULARIO', 'LANDING TOT', 'LLAMADA UNINTER', 'OPEN SCHOOL ESPECIAL POR CONVENIO CON EMPRESA',
                       'VISITA UNINTER'),
     FechaInscripcion DATE,
-    CarreraInscripcion INT(11),
+    CarreraInscripcion INT,
     BecaOfrecida DECIMAL(10, 2),
     NumeroLista INT,
     PromotorOriginal INT,
@@ -56,34 +98,14 @@ CREATE TABLE Leads (
     PromotorActual INT,
     FechaPromotorActual DATE,
     Comentarios TEXT,
-    Contacto INT
-);
--- Continuación del script
-
--- Crear la tabla "Campana"
-CREATE TABLE Campana (
-    CampanaID INT AUTO_INCREMENT PRIMARY KEY,
-    TipoCamp VARCHAR(255),
-    Nombre VARCHAR(255)
-);
-
--- Crear la tabla "CarreraInteres"
-CREATE TABLE CarreraInteres (
-    CarreraID INT AUTO_INCREMENT PRIMARY KEY,
-    Nombre VARCHAR(255)
-);
-
--- Crear la tabla "Contacto"
-CREATE TABLE Contacto (
-    ContactoID INT AUTO_INCREMENT PRIMARY KEY,
-    FechaContacto DATE,
-    Comentario VARCHAR(255)
-);
-
--- Crear la tabla "MedioDeContacto"
-CREATE TABLE MedioDeContacto (
-    MedioID INT AUTO_INCREMENT PRIMARY KEY,
-    Nombre CHAR(255)
+    Contacto INT,
+    FOREIGN KEY (CarreraInteresID) REFERENCES Carreras(CarreraID),
+    FOREIGN KEY (CampanaID) REFERENCES Campana(CampanaID),
+    FOREIGN KEY (MedioDeContactoID) REFERENCES MedioDeContacto(MedioID),
+    FOREIGN KEY (PromotorOriginal) REFERENCES Promotor(PromotorID),
+    FOREIGN KEY (PromotorActual) REFERENCES Promotor(PromotorID),
+    FOREIGN KEY (CarreraInscripcion) REFERENCES Carreras(CarreraID),
+    FOREIGN KEY (Contacto) REFERENCES Contacto(ContactoID)
 );
 
 -- Crear la tabla "Reasignaciones"
@@ -92,20 +114,10 @@ CREATE TABLE Reasignaciones (
     LeadID INT,
     PromotorAnterior INT,
     PromotorNuevo INT,
-    FechaReasignacion DATETIME
-);
-
--- Crear la tabla "ContactoAlumno"
-CREATE TABLE ContactoAlumno(
-    ContactoAlumnoID INT PRIMARY KEY AUTO_INCREMENT,
-    FechaContacto DATE,
-    Comentario VARCHAR(255)
-);
-
--- Crear la tabla "Carreras"
-CREATE TABLE Carreras (
-    CarreraID INT AUTO_INCREMENT PRIMARY KEY,
-    Nombre VARCHAR(255)
+    FechaReasignacion DATETIME,
+    FOREIGN KEY (LeadID) REFERENCES Leads(LeadID),
+    FOREIGN KEY (PromotorAnterior) REFERENCES Promotor(PromotorID),
+    FOREIGN KEY (PromotorNuevo) REFERENCES Promotor(PromotorID)
 );
 
 -- Crear la tabla "Alumnos"
@@ -138,15 +150,6 @@ CREATE TABLE Alumnos (
     FOREIGN KEY (CarreraInscripcion) REFERENCES Carreras(CarreraID)
 );
 
--- Crear la tabla "users"
-CREATE TABLE users(
-	idUser Int primary key auto_increment not null,
-    userName varchar(30) not null,
-    email varchar(30),
-    password varchar(30) not null,
-    role enum('admin','promotor','coordinador')
-);
-
 -- Crear la tabla "ListaComision"
 CREATE TABLE ListaComision (
     ListaComisionID INT AUTO_INCREMENT PRIMARY KEY,
@@ -177,83 +180,9 @@ CREATE TABLE ListaComision (
     FechaNacimientoProspecto DATE,
     FOREIGN KEY (PromotorID) REFERENCES Promotor(PromotorID),
     FOREIGN KEY (AlumnoID) REFERENCES Alumnos(AlumnoID),
-    FOREIGN KEY (ProgramaID) REFERENCES CarreraInteres(CarreraID),
+    FOREIGN KEY (ProgramaID) REFERENCES Carreras(CarreraID),
     FOREIGN KEY (MedioDeContactoID) REFERENCES MedioDeContacto(MedioID)
 );
-
--- Agregar la relación entre Leads y CarreraInteres
-ALTER TABLE Leads
-ADD FOREIGN KEY (CarreraInteresID) REFERENCES CarreraInteres(CarreraID);
-
-ALTER TABLE Leads
-ADD FOREIGN KEY (CarreraInscripcion) REFERENCES CarreraInteres(CarreraID);
-
--- Agregar la relación entre Leads y Campana
-ALTER TABLE Leads
-ADD FOREIGN KEY (CampanaID) REFERENCES Campana(CampanaID);
-
--- Agregar la relación entre Leads y MedioDeContacto
-ALTER TABLE Leads
-ADD FOREIGN KEY (MedioDeContactoID) REFERENCES MedioDeContacto(MedioID);
-
--- Agregar la relación entre Leads y PromotorOriginal
-ALTER TABLE Leads
-ADD FOREIGN KEY (PromotorOriginal) REFERENCES Promotor(PromotorID);
-
--- Agregar la relación entre Leads y PromotorActual
-ALTER TABLE Leads
-ADD FOREIGN KEY (PromotorActual) REFERENCES Promotor(PromotorID);
-
--- Agregar la relación entre Reasignaciones y Leads
-ALTER TABLE Reasignaciones
-ADD FOREIGN KEY (LeadID) REFERENCES Leads(LeadID);
-
--- Agregar la relación entre Reasignaciones y PromotorAnterior
-ALTER TABLE Reasignaciones
-ADD FOREIGN KEY (PromotorAnterior) REFERENCES Promotor(PromotorID);
-
--- Agregar la relación entre Reasignaciones y PromotorNuevo
-ALTER TABLE Reasignaciones
-ADD FOREIGN KEY (PromotorNuevo) REFERENCES Promotor(PromotorID);
-
--- Agregar la relación entre Leads y Contactos
-ALTER TABLE Leads
-ADD FOREIGN KEY (Contacto) REFERENCES Contacto(ContactoID);
-
--- Consulta del nombre de los promotores Actual
-SELECT 
-    P.nombre as NombrePromotor
-FROM Leads L
-JOIN promotor P ON L.PromotorActual = P.PromotorID;
-
--- Consulta el nombre del promotor nuevo que se reasigno a un Lead
-SELECT
-    L.NombreCompleto,
-    P.nombre as PromotorNuevo
-FROM reasignaciones R
-JOIN Leads L ON R.LeadID = L.LeadID
-JOIN promotor P ON R.PromotorNuevo = P.promotorID;
-
--- Consulta de carrera de Interes por Lead
-SELECT 
-    L.NombreCompleto,
-    CI.Nombre
-FROM leads L
-JOIN carrerainteres CI ON L.CarreraInteresID = CI.CarreraID;
-
--- Consulta de por campana
-SELECT
-    L.NombreCompleto,
-    C.Nombre
-FROM leads L
-JOIN campana C ON L.CampanaID = C.campanaID;
-
--- Consulta Medio de contacto
-SELECT
-    L.NombreCompleto,
-    MC.Nombre
-FROM leads L
-JOIN mediodecontacto MC ON L.MedioDeContactoID = MC.MedioID;
 
 -- Trigger para saber la cantidad de regisros por mes de los leads
 CREATE TABLE leadxmes (
@@ -268,6 +197,76 @@ CREATE TABLE leadxmes_promotor (
     nombrePromotor INT,
     cantidad_registros INT
 );
+
+
+-- Inserciones para la tabla "Promotor"
+INSERT INTO Promotor (Nombre, Correo, Passw, Telefono, Estado) VALUES
+('Juan Pérez', 'juan@example.com', 'password123', '555-1234', TRUE),
+('María Gómez', 'maria@example.com', 'securepass', '555-5678', TRUE);
+
+-- Inserciones para la tabla "Campana"
+INSERT INTO Campana (TipoCamp, Nombre) VALUES
+('Campaña 1', 'Verano 2023'),
+('Campaña 2', 'Otoño 2023');
+
+-- Inserciones para la tabla "Contacto"
+INSERT INTO Contacto (FechaContacto, Comentario) VALUES
+('2023-01-01', 'Primer contacto por teléfono'),
+('2023-02-15', 'Correo enviado para seguimiento');
+
+-- Inserciones para la tabla "MedioDeContacto"
+INSERT INTO MedioDeContacto (Nombre) VALUES
+('Teléfono'), ('Correo Electrónico'), ('Redes Sociales');
+
+
+
+-- Inserciones para la tabla "ContactoAlumno"
+INSERT INTO ContactoAlumno (FechaContacto, Comentario) VALUES
+('2023-04-10', 'Entrevista realizada con el alumno 1'),
+('2023-04-20', 'Reunión con los padres del alumno 2');
+
+-- Inserciones para la tabla "Carreras"
+INSERT INTO Carreras (Nombre) VALUES
+('Licenciatura en Informática'), ('Maestría en Administración');
+
+-- Inserciones para la tabla "users"
+INSERT INTO users (userName, email, password, role) VALUES
+('adminuser', 'admin@example.com', 'adminpass', 'admin'),
+('promotoruser', 'promotor@example.com', 'promotorpass', 'promotor');
+
+
+-- Inserciones para la tabla "Leads"
+INSERT INTO Leads (NombreCompleto, Telefono, Telefono2, CorreoElectronico, CorreoElectronico2, FechaPrimerContacto, FechaNac,
+EscuelaProcedencia, NombrePais, NombreEstado, NombreCiudad, PSeguimiento, CarreraInteresID, Grado, Programa, EstatusInsc, SemestreIngreso, Ciclo, CampanaID,
+AsetNameForm, IsOrganic, MedioDeContactoID, TipoReferido, NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista,
+PromotorOriginal, FechaPromotorOriginal, PromotorActual, FechaPromotorActual, Comentarios, Contacto) VALUES
+('Carlos Rodríguez', '555-1111', NULL, 'carlos@example.com', NULL, '2023-01-15', '2002-03-10', 'Escuela A', 'México', 'Ciudad de México', 'Benito Juárez',
+  'P-PROSPECTO', 1, 'BACHILLERATO', 1, 'INSC', '1 Semestre', '2023A', 1, 'Formulario1', 'PAUTA', 2, 'PERSONAL UNINTER', 'Juan Pérez', 'B_POSGRADOS',
+  '2023-02-01', 1, 0.00, 101, NULL, NULL, NULL, NULL, NULL, NULL),
+('Ana Gómez', '555-2222', '555-3333', 'ana@example.com', 'ana2@example.com', '2023-02-10', '1998-11-25', 'Escuela B', 'México', 'Estado de México', 'Toluca',
+  'PS-SEGUIMIENTO', 2, 'LIC/ING', 1, 'REZA', '2 Semestre', '2023A', 2, 'Formulario2', 'ORGÁNICO', 1, 'ESTUDIANTE', 'María Gómez', 'REDES SOCIALES META INSTAGRAM',
+  '2023-03-01', 2, 300.00, 102, 1, '2023-02-15', 2, '2023-03-01', 'Comentario sobre la situación', 2);
+
+-- Inserciones para la tabla "Alumnos"
+INSERT INTO Alumnos (LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia,
+TipoBaja, RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwiter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional) VALUES
+(1, 'Carlos Rodríguez', '555-1111', 'Escuela A', 1, 'REC2023001', 'LIC2023001', 1, 'Local', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 'INSC', NULL, 'carlos@example.com'),
+(2, 'Ana Gómez', '555-2222', 'Escuela B', 2, 'REC2023002', 'MAES2023002', 2, 'Foraneo', 'Definitiva', NULL, 'ana2@example.com', NULL, NULL, NULL, 5558888, NULL, 2, 'BAJA', '2023-05-20', 'ana@example.com');
+
+-- Inserciones para la tabla "Reasignaciones"
+INSERT INTO Reasignaciones (LeadID, PromotorAnterior, PromotorNuevo, FechaReasignacion) VALUES
+(1, 2, 1, '2023-03-01'),
+(2, 1, 2, '2023-03-05');
+-- Inserciones para la tabla "ListaComision"
+INSERT INTO ListaComision (PromotorID, FechaInscripcionAlumno, AlumnoID, Status, CicloEscolar, ProgramaID, SemestreIngreso, Matricula, NoRecibo,
+PorcentajeBeca, TotalComision, EscuelaProcedencia, Escuela, Pais, Estado, Municipio, MedioDeContactoID, CanalDeVenta, EsReferido,
+PromocionInscripcion, NumTelefonicoAlumno, CorreoElectronicoProspecto, FechaNacimientoProspecto) VALUES
+(1, '2023-05-01', 1, 'INSC', '2023A', 1, 'Licenciatura', 'LIC2023001', 'REC2023001', '10%', 500.00, 'Escuela X', 'PRIVADA', 'México', 'Ciudad de México', 'Benito Juárez',
+  1, 'WHATSAPP', 'PERSONAL UNINTER', 'FLASH PASS', '555-9999', 'alumno1@example.com', '2000-01-15'),
+(2, '2023-05-05', 2, 'INSO', '2023A', 2, 'Maestría', 'MAES2023002', 'REC2023002', '15%', 700.00, 'Escuela Y', 'PÚBLICA', 'México', 'Estado de México', 'Toluca',
+  2, 'CORREO', 'ESTUDIANTE', 'EGRESADO', '555-8888', 'alumno2@example.com', '1998-08-20');
+
+
 
 DELIMITER //
 CREATE TRIGGER actualizar_conteo
@@ -368,3 +367,4 @@ BEGIN
 END;
 //
 DELIMITER ;
+
