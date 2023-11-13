@@ -98,8 +98,8 @@ CREATE TABLE Reasignaciones (
 -- Crear la tabla "ContactoAlumno"
 CREATE TABLE ContactoAlumno(
     ContactoAlumnoID INT PRIMARY KEY AUTO_INCREMENT,
-    LeadID INT,
-    ContactoID INT
+    FechaContacto DATE,
+    Comentario VARCHAR(255)
 );
 
 -- Crear la tabla "Carreras"
@@ -220,8 +220,6 @@ ADD FOREIGN KEY (PromotorNuevo) REFERENCES Promotor(PromotorID);
 ALTER TABLE Leads
 ADD FOREIGN KEY (Contacto) REFERENCES Contacto(ContactoID);
 
-<<<<<<< HEAD
-=======
 
 -- mis insert
 #contactoAlumno
@@ -258,7 +256,6 @@ VALUES (NULL, 'Mariana Lopez', '5551234567', NULL, 'mariana@email.com', NULL, '2
 #reasignaciones
 INSERT INTO `reasignaciones` (`ReasignacionID`, `LeadID`, `PromotorAnterior`, `PromotorNuevo`, `FechaReasignacion`) VALUES (NULL, '1', '1', '2', '2023-11-16 14:33:50');
 
->>>>>>> 2912762975087844683094117fc4807227ed21b4
 -- Consultas a tablas
 
 -- Inserts para la tabla "Promotor"
@@ -449,18 +446,6 @@ UPDATE leads SET EstatusInsc = 'INSC' WHERE LeadID= 3;
 //
 DELIMITER ;
 
-<<<<<<< HEAD
--- Continuación del script
-
--- Consulta para obtener la cantidad de registros por mes
-SELECT * FROM leadxmes;
-
--- Consulta para obtener la cantidad de registros por mes y promotor
-SELECT * FROM leadxmes_promotor;
-
--- Fin del script
-
-=======
 DELIMITER //
 CREATE TRIGGER insert_users
 AFTER INSERT ON promotor
@@ -472,4 +457,3 @@ BEGIN
 END;
 //
 DELIMITER ;
->>>>>>> 2912762975087844683094117fc4807227ed21b4
