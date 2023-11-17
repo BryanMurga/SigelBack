@@ -60,7 +60,7 @@ CREATE TABLE Leads (
     LeadID INT AUTO_INCREMENT PRIMARY KEY,
     NombreCompleto VARCHAR(255),
     Telefono VARCHAR(20),
-    Telefono2 INT(20),
+    Telefono2 Varchar(20),
     CorreoElectronico VARCHAR(255),
     CorreoElectronico2 VARCHAR(255),
     FechaPrimerContacto DATE,
@@ -74,7 +74,8 @@ CREATE TABLE Leads (
                       'DU-DUPLICADO', 'DI-DATO NO VALIDO', 'BA-BAJA ALUMNO', 'VACIO'),
     CarreraInteresID INT,
     Grado ENUM('SECUNDARIA', 'BACHILLERATO', 'PREPA-A', 'LIC/ING', 'ESPECIALIDAD', 'DIPLOMADO', 'MAESTRIA', 'DOCTORADO', 'NO ESPECIFICA'),
-    Programa INT(1),
+    Programa enum('ADMINISTRACIÓN','ADMINISTRACION DE EMPRESAS','ADMINISTRACION DE NEGOCIOS INTERNACIONALES','ARQ','BACHILLERATO SEMESTRAL','BILINGÜE','BIU','BIUB','BIUM','CIENCIAS POLÍTICAS, RELACIONES INT.','CLS PRT','CORP','CURSO DE VERANO','Curso Intensivo','DAD','DDI','DDPAI','DEI','DEPU','DHU','DI','DIP','DISEÑO DE MODAS','DISEÑO GRÁFICO','DMD','DPU','EAO','EAPD','EAPD y LADD','EATL', 'LDI','LDM','LECE','LED','LEF','LEM',
+	'LEMK','LEMP','LIC','LICENCIATURA','LID','LPS','LRI','MADE','MADEL','MARET','MDG','MEL','MELE','MERCADOTECNIA','MGC','MI','NIÑOS','OFERTA EDUCATIVA','PEDAGOGÍA','PREPA A','PREPA-A','REGLR','SIU','SIUB','SIUM','UNI LAE','LPE') ,
     EstatusInsc ENUM('INSO', 'REZA', 'INSC', 'BAJA', 'ARCHIVAR'),
     SemestreIngreso ENUM('1 Semestre', '2 Semestre', '3 Semestre', '4 Semestre', '5 Semestre', '6 Semestre', '7 Semestre', '8 Semestre',
     'Maestria', 'Doctorado', 'Licenciatura', 'Diplomados'),
@@ -241,10 +242,13 @@ EscuelaProcedencia, NombrePais, NombreEstado, NombreCiudad, PSeguimiento, Carrer
 AsetNameForm, IsOrganic, MedioDeContactoID, TipoReferido, NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista,
 PromotorOriginal, FechaPromotorOriginal, PromotorActual, FechaPromotorActual, Comentarios, Contacto) VALUES
 ('Carlos Rodríguez', '555-1111', NULL, 'carlos@example.com', NULL, '2023-01-15', '2002-03-10', 'Escuela A', 'México', 'Ciudad de México', 'Benito Juárez',
-  'P-PROSPECTO', 1, 'BACHILLERATO', 1, 'INSC', '1 Semestre', '2023A', 1, 'Formulario1', 'PAUTA', 2, 'PERSONAL UNINTER', 'Juan Pérez', 'B_POSGRADOS',
+  'P-PROSPECTO', 1, 'BACHILLERATO', 'LDI', 'INSC', '1 Semestre', '2023A', 1, 'Formulario1', 'PAUTA', 2, 'PERSONAL UNINTER', 'Juan Pérez', 'B_POSGRADOS',
   '2023-02-01', 1, 0.00, 101, NULL, NULL, NULL, NULL, NULL, NULL),
 ('Ana Gómez', '555-2222', '555-3333', 'ana@example.com', 'ana2@example.com', '2023-02-10', '1998-11-25', 'Escuela B', 'México', 'Estado de México', 'Toluca',
-  'PS-SEGUIMIENTO', 2, 'LIC/ING', 1, 'REZA', '2 Semestre', '2023A', 2, 'Formulario2', 'ORGÁNICO', 1, 'ESTUDIANTE', 'María Gómez', 'REDES SOCIALES META INSTAGRAM',
+  'PS-SEGUIMIENTO', 2, 'LIC/ING', 'PEDAGOGÍA', 'REZA', '2 Semestre', '2023A', 2, 'Formulario2', 'ORGÁNICO', 1, 'ESTUDIANTE', 'María Gómez', 'REDES SOCIALES META INSTAGRAM',
+  '2023-03-01', 2, 300.00, 102, 1, '2023-02-15', 2, '2023-03-01', 'Comentario sobre la situación', 2),
+  ('Bryan Murga', '7771301194', '555-3333', 'bryan@example.com', 'bryan2@example.com', '2023-02-10', '1998-11-25', 'Escuela B', 'México', 'Estado de México', 'Toluca',
+  'PS-SEGUIMIENTO', 2, 'LIC/ING', 'SIU', 'REZA', '2 Semestre', '2023A', 2, 'Formulario2', 'ORGÁNICO', 1, 'ESTUDIANTE', 'María Gómez', 'REDES SOCIALES META INSTAGRAM',
   '2023-03-01', 2, 300.00, 102, 1, '2023-02-15', 2, '2023-03-01', 'Comentario sobre la situación', 2);
 
 -- Inserciones para la tabla "Alumnos"
@@ -367,4 +371,18 @@ BEGIN
 END;
 //
 DELIMITER ;
+
+-- Select de los leads
+SELECT leads.NombreCompleto, leads.telefono,leads.telefono2, leads.CorreoElectronico, leads.CorreoElectronico2, leads.FechaPrimerContacto,
+leads.FechaNac, leads.EscuelaProcedencia, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.PSeguimiento, leads.Grado,
+leads.EstatusInsc,leads.SemestreIngreso, leads.Ciclo, leads.AsetNameForm, leads.IsOrganic, leads.TipoReferido, leads.NombreReferido, leads.DondeObtDato, 
+leads.FechaInscripcion, leads.BecaOfrecida, leads.NumeroLista, leads.FechaPromotorOriginal, leads.FechaPromotorActual, leads.Comentarios, 
+CarrerasInt.Nombre as CarreraInteres,  Campana.Nombre as NombreCampana, MedioDeContacto.Nombre as MedioContacto, CarreraIns.Nombre as CarreraInscrita, PromotorOri.Nombre as NombrePromotorOri, PromotorAct.Nombre as NombrePromotorAct 
+from leads
+LEFT JOIN Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID
+LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID
+LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID
+LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID
+LEFT JOIN Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID
+LEFT JOIN Promotor PromotorAct ON leads.PromotorOriginal = PromotorAct.PromotorID;
 
