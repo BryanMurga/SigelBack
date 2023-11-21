@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 // Obtener promotores activos
 router.get('/activos', async (req, res) => {
   try {
-    const promotoresActivos = await pool.query('SELECT Nombre FROM Promotor WHERE Estado = ?', [1]);
+    const promotoresActivos = await pool.query('SELECT PromotorID, Nombre FROM Promotor WHERE Estado = ?', [1]);
     if (promotoresActivos.length === 0) {
       return res.status(404).json({ error: 'No se encontraron promotores activos' });
     }
