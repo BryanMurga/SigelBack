@@ -57,16 +57,16 @@ router.get('/:id', async (req, res) => {
 
 // Crear un nuevo promotor
 router.post('/create', async (req, res) => {
-  const { Nombre, Correo, Telefono } = req.body;
+  const { Nombre, Correo, Telefono, Passw } = req.body;
 
-  if (!Nombre || !Correo || !Telefono) {
+  if (!Nombre || !Correo || !Telefono || !Passw ) {
     return res.status(400).json({ error: 'Todos los campos obligatorios deben estar presentes' });
   }
 
-  const query = 'INSERT INTO Promotor (Nombre, Correo, Telefono) VALUES (?, ?, ?)';
+  const query = 'INSERT INTO Promotor (Nombre, Correo, Telefono, Passw) VALUES (?, ?, ?, ?)';
 
   try {
-    const result = await pool.query(query, [Nombre, Correo, Telefono]);
+    const result = await pool.query(query, [Nombre, Correo, Telefono, Passw]);
     res.json({ status: 200, message: 'Promotor creado exitosamente', insertedId: result.insertId });
   } catch (error) {
     console.error('Error al crear el promotor:', error);

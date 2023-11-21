@@ -156,6 +156,26 @@ router.get('/contacto/:id', async (req, res) => {
 });
 
 
+// Ruta para manejar la reasignación de leads
+router.post('/reasignar', async (req, res) => {
+  try {
+    // Obtener las reasignaciones desde el cuerpo de la solicitud
+    const reasignaciones = req.body.reasignaciones;
+
+    // Iterar sobre cada reasignación y actualizar la base de datos
+    for (const { leadId, nuevoPromotorId } of reasignaciones) {
+      await pool.query('UPDATE Leads SET PromotorActual = ? WHERE LeadID = ?', [nuevoPromotorId, leadId]);
+    }
+
+    // Responder con un mensaje de éxito
+    res.json({ status: 200, message: 'Reasignaciones guardadas exitosamente' });
+  } catch (error) {
+    console.error('Error al procesar reasignaciones:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
+
 
 
 module.exports = router;
