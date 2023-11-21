@@ -19,6 +19,21 @@ router.get('/', async (req, res) => {
   } 
 });
 
+router.get('/asignacion', async (req, res) => {
+
+  try {
+    const leads = await pool.query('SELECT * from leads where PromotorActual is null');
+    res.json({
+      status: 200,
+      message: 'Se ha obtenido los leads correctamente',
+      leads: leads,
+    });
+  } catch (error) {
+    console.error('Error al obtener los leads:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  } 
+});
+
 // Obtener un lead por su ID
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
