@@ -77,16 +77,16 @@ router.post('/create', async (req, res) => {
 // Actualizar la información de un promotor por su ID
 router.put('/update/:id', async (req, res) => {
   const { id } = req.params;
-  const { Nombre, Correo, Telefono } = req.body;
+  const { Nombre, Correo, Telefono, Estado, Passw } = req.body;
 
   if (!Nombre || !Correo || !Telefono) {
     return res.status(400).json({ error: 'Todos los campos obligatorios deben estar presentes' });
   }
 
-  const query = 'UPDATE Promotor SET Nombre = ?, Correo = ?, Telefono = ? WHERE PromotorID = ?';
+  const query = 'UPDATE Promotor SET Nombre = ?, Correo = ?, Telefono = ?, Estado = ?, Passw = ? WHERE PromotorID = ?';
 
   try {
-    await pool.query(query, [Nombre, Correo, Telefono, id]);
+    await pool.query(query, [Nombre, Correo, Telefono, Estado, Passw, id]);
     res.json({ status: 200, message: 'Promotor actualizado exitosamente' });
   } catch (error) {
     console.error('Error al actualizar el promotor:', error);
