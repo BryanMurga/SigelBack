@@ -22,7 +22,7 @@ router.get('/', async (req, res) => {
 router.get('/asignacion', async (req, res) => {
 
   try {
-    const leads = await pool.query('SELECT * from leads where PromotorActual is null');
+    const leads = await pool.query('SELECT * from leads where PromotorOriginal is null');
     res.json({
       status: 200,
       message: 'Se ha obtenido los leads correctamente',
@@ -94,18 +94,19 @@ router.post('/create', async (req, res) => {
   }
 });
 
-// Actualizar solo el campo PromotorActual de un lead por su ID
+// Actualizar solo el campo Promotor Original de un lead por su ID
 router.put('/update-promotor/:id', async (req, res) => {
   const { id } = req.params;
-  const { PromotorActual } = req.body;
+  const { PromotorOriginal } = req.body;
 
   // Validar que el campo PromotorActual esté presente en la solicitud
-  if (!PromotorActual) {
-    return res.status(400).json({ error: 'El campo PromotorActual es obligatorio' });
+  if (!PromotorOriginal) {
+    return res.status(400).json({ error: 'El campo Promotor Original es obligatorio' });
   }
 
-  const query = `UPDATE Leads SET PromotorActual = ? WHERE LeadID = ?`;
-  const values = [PromotorActual, id];
+  const fechaActual = new Date().toISOString().slice(0, 19).replace('T', ' ');  
+  const query = `UPDATE Leads SET PromotorOriginal = ?, FechaPromotorOriginal = ?, PromotorActual = ?, FechaPromotorActual = ?  WHERE LeadID = ?`;
+  const values = [PromotorOriginal,fechaActual,PromotorOriginal,fechaActual, id];
 
   try {
     await pool.query(query, values);
