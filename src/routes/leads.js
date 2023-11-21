@@ -79,6 +79,28 @@ router.post('/create', async (req, res) => {
   }
 });
 
+// Actualizar solo el campo PromotorActual de un lead por su ID
+router.put('/update-promotor/:id', async (req, res) => {
+  const { id } = req.params;
+  const { PromotorActual } = req.body;
+
+  // Validar que el campo PromotorActual esté presente en la solicitud
+  if (!PromotorActual) {
+    return res.status(400).json({ error: 'El campo PromotorActual es obligatorio' });
+  }
+
+  const query = `UPDATE Leads SET PromotorActual = ? WHERE LeadID = ?`;
+  const values = [PromotorActual, id];
+
+  try {
+    await pool.query(query, values);
+    res.json({ status: 200, message: 'Promotor actualizado exitosamente' });
+  } catch (error) {
+    console.error('Error al actualizar el promotor del lead:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
 // Actualizar la información de un lead por su ID
 router.put('/update/:id', async (req, res) => {
   const { id } = req.params;
