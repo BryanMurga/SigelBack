@@ -19,13 +19,6 @@ CREATE TABLE Campana (
     Nombre VARCHAR(255)
 );
 
--- Crear la tabla "Contacto"
-CREATE TABLE Contacto (
-    ContactoID INT AUTO_INCREMENT PRIMARY KEY,
-    FechaContacto DATE,
-    Comentario VARCHAR(255)
-);
-
 -- Crear la tabla "MedioDeContacto"
 CREATE TABLE MedioDeContacto (
     MedioID INT AUTO_INCREMENT PRIMARY KEY,
@@ -105,8 +98,16 @@ CREATE TABLE Leads (
     FOREIGN KEY (MedioDeContactoID) REFERENCES MedioDeContacto(MedioID),
     FOREIGN KEY (PromotorOriginal) REFERENCES Promotor(PromotorID),
     FOREIGN KEY (PromotorActual) REFERENCES Promotor(PromotorID),
-    FOREIGN KEY (CarreraInscripcion) REFERENCES Carreras(CarreraID),
-    FOREIGN KEY (Contacto) REFERENCES Contacto(ContactoID)
+    FOREIGN KEY (CarreraInscripcion) REFERENCES Carreras(CarreraID)
+);
+
+-- Crear la tabla "Contacto"
+CREATE TABLE Contacto (
+    ContactoID INT AUTO_INCREMENT PRIMARY KEY,
+    LeadID int,
+    FechaContacto DATE,
+    Comentario VARCHAR(255),
+    FOREIGN KEY (LeadID) REFERENCES leads(LeadID)
 );
 
 -- Crear la tabla "Reasignaciones"
@@ -210,11 +211,6 @@ INSERT INTO Campana (TipoCamp, Nombre) VALUES
 ('Campaña 1', 'Verano 2023'),
 ('Campaña 2', 'Otoño 2023');
 
--- Inserciones para la tabla "Contacto"
-INSERT INTO Contacto (FechaContacto, Comentario) VALUES
-('2023-01-01', 'Primer contacto por teléfono'),
-('2023-02-15', 'Correo enviado para seguimiento');
-
 -- Inserciones para la tabla "MedioDeContacto"
 INSERT INTO MedioDeContacto (Nombre) VALUES
 ('Teléfono'), ('Correo Electrónico'), ('Redes Sociales');
@@ -250,6 +246,12 @@ PromotorOriginal, FechaPromotorOriginal, PromotorActual, FechaPromotorActual, Co
   ('Bryan Murga', '7771301194', '555-3333', 'bryan@example.com', 'bryan2@example.com', '2023-02-10', '1998-11-25', 'Escuela B', 'México', 'Estado de México', 'Toluca',
   'PS-SEGUIMIENTO', 2, 'LIC/ING', 'SIU', 'REZA', '2 Semestre', '2023A', 2, 'Formulario2', 'ORGÁNICO', 1, 'ESTUDIANTE', 'María Gómez', 'REDES SOCIALES META INSTAGRAM',
   '2023-03-01', 2, 300.00, 102, 1, '2023-02-15', 2, '2023-03-01', 'Comentario sobre la situación', 2);
+  
+-- Inserciones para la tabla "Contacto"
+INSERT INTO Contacto (leadID,FechaContacto, Comentario) VALUES
+(1,'2023-01-01', 'Primer contacto por teléfono'),
+(2,'2023-01-01', 'Primer contacto por teléfono'),
+(2,'2023-02-15', 'Correo enviado para seguimiento');
 
 -- Inserciones para la tabla "Alumnos"
 INSERT INTO Alumnos (LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia,
@@ -385,4 +387,6 @@ LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID
 LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID
 LEFT JOIN Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID
 LEFT JOIN Promotor PromotorAct ON leads.PromotorOriginal = PromotorAct.PromotorID;
+
+select leads.NombreCompleto, contacto.FechaContacto, contacto.Comentario from Contacto left join leads on Contacto.LeadID = leads.LeadID where Contacto.LeadID = 2;
 
