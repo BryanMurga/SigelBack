@@ -19,6 +19,21 @@ router.get('/', async (req, res) => {
   } 
 });
 
+router.get('/asignacion', async (req, res) => {
+
+  try {
+    const leads = await pool.query('SELECT * from leads where PromotorActual is null');
+    res.json({
+      status: 200,
+      message: 'Se ha obtenido los leads correctamente',
+      leads: leads,
+    });
+  } catch (error) {
+    console.error('Error al obtener los leads:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  } 
+});
+
 // Obtener un lead por su ID
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
@@ -75,6 +90,28 @@ router.post('/create', async (req, res) => {
     res.json({ status: 200, message: 'Lead creado exitosamente', insertedId: result.insertId });
   } catch (error) {
     console.error('Error al crear el lead:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
+// Actualizar solo el campo PromotorActual de un lead por su ID
+router.put('/update-promotor/:id', async (req, res) => {
+  const { id } = req.params;
+  const { PromotorActual } = req.body;
+
+  // Validar que el campo PromotorActual esté presente en la solicitud
+  if (!PromotorActual) {
+    return res.status(400).json({ error: 'El campo PromotorActual es obligatorio' });
+  }
+
+  const query = `UPDATE Leads SET PromotorActual = ? WHERE LeadID = ?`;
+  const values = [PromotorActual, id];
+
+  try {
+    await pool.query(query, values);
+    res.json({ status: 200, message: 'Promotor actualizado exitosamente' });
+  } catch (error) {
+    console.error('Error al actualizar el promotor del lead:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
