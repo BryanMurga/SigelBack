@@ -34,6 +34,22 @@ router.get('/asignacion', async (req, res) => {
   } 
 });
 
+// Obtener leads con promotores asignados
+router.get('/reasignacion', async (req, res) => {
+
+  try {
+    const leads = await pool.query('SELECT leads.LeadID, leads.NombreCompleto, leads.telefono,leads.telefono2, leads.CorreoElectronico, leads.CorreoElectronico2, leads.FechaPrimerContacto,leads.FechaNac, leads.EscuelaProcedencia, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.PSeguimiento, leads.Grado,leads.EstatusInsc,leads.SemestreIngreso, leads.Ciclo, leads.AsetNameForm, leads.IsOrganic, leads.TipoReferido, leads.NombreReferido, leads.DondeObtDato, leads.FechaInscripcion, leads.BecaOfrecida, leads.NumeroLista, leads.FechaPromotorOriginal, leads.FechaPromotorActual, leads.Comentarios, leads.Programa, CarrerasInt.Nombre as CarreraInteres,  Campana.Nombre as NombreCampana, MedioDeContacto.Nombre as MedioContacto, CarreraIns.Nombre as CarreraInscrita, PromotorOri.Nombre as NombrePromotorOri, PromotorAct.Nombre as NombrePromotorAct from leads LEFT JOIN Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID LEFT JOIN Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID LEFT JOIN Promotor PromotorAct ON leads.PromotorActual = PromotorAct.PromotorID where PromotorOriginal is not null;');
+    res.json({
+      status: 200,
+      message: 'Se ha obtenido los leads correctamente',
+      leads: leads,
+    });
+  } catch (error) {
+    console.error('Error al obtener los leads:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  } 
+});
+
 // Obtener un lead por su ID
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
@@ -107,6 +123,29 @@ router.put('/update-promotor/:id', async (req, res) => {
   const fechaActual = new Date().toISOString().slice(0, 19).replace('T', ' ');  
   const query = 'UPDATE Leads SET PromotorOriginal = ?, FechaPromotorOriginal = ? WHERE LeadID = ?';
   const values = [PromotorOriginal,fechaActual, id];
+
+  try {
+    await pool.query(query, values);
+    res.json({ status: 200, message: 'Promotor actualizado exitosamente' });
+  } catch (error) {
+    console.error('Error al actualizar el promotor del lead:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
+// Actualizar solo el campo Promotor Actual de un lead por su ID
+router.put('/update-promotor-actual/:id', async (req, res) => {
+  const { id } = req.params;
+  const { PromotorActual } = req.body;
+
+  // Validar que el campo PromotorActual esté presente en la solicitud
+  if (!PromotorActual) {
+    return res.status(400).json({ error: 'El campo Promotor Actual es obligatorio' });
+  }
+
+  const fechaActual = new Date().toISOString().slice(0, 19).replace('T', ' ');  
+  const query = `UPDATE Leads SET PromotorActual = ?, FechaPromotorActual = ? WHERE LeadID = ?`;
+  const values = [PromotorActual,fechaActual, id];
 
   try {
     await pool.query(query, values);
