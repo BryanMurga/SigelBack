@@ -114,12 +114,9 @@ CREATE TABLE Contacto (
 CREATE TABLE Reasignaciones (
     ReasignacionID INT AUTO_INCREMENT PRIMARY KEY,
     LeadID INT,
-    PromotorAnterior INT,
-    PromotorNuevo INT,
+    NombrePromotor VARCHAR (255),
     FechaReasignacion DATETIME,
-    FOREIGN KEY (LeadID) REFERENCES Leads(LeadID),
-    FOREIGN KEY (PromotorAnterior) REFERENCES Promotor(PromotorID),
-    FOREIGN KEY (PromotorNuevo) REFERENCES Promotor(PromotorID)
+    FOREIGN KEY (LeadID) REFERENCES Leads(LeadID)
 );
 
 -- Crear la tabla "Alumnos"
@@ -259,10 +256,6 @@ TipoBaja, RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwiter, RSWhatsapp, R
 (1, 'Carlos Rodríguez', '555-1111', 'Escuela A', 1, 'REC2023001', 'LIC2023001', 1, 'Local', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 'INSC', NULL, 'carlos@example.com'),
 (2, 'Ana Gómez', '555-2222', 'Escuela B', 2, 'REC2023002', 'MAES2023002', 2, 'Foraneo', 'Definitiva', NULL, 'ana2@example.com', NULL, NULL, NULL, 5558888, NULL, 2, 'BAJA', '2023-05-20', 'ana@example.com');
 
--- Inserciones para la tabla "Reasignaciones"
-INSERT INTO Reasignaciones (LeadID, PromotorAnterior, PromotorNuevo, FechaReasignacion) VALUES
-(1, 2, 1, '2023-03-01'),
-(2, 1, 2, '2023-03-05');
 -- Inserciones para la tabla "ListaComision"
 INSERT INTO ListaComision (PromotorID, FechaInscripcionAlumno, AlumnoID, Status, CicloEscolar, ProgramaID, SemestreIngreso, Matricula, NoRecibo,
 PorcentajeBeca, TotalComision, EscuelaProcedencia, Escuela, Pais, Estado, Municipio, MedioDeContactoID, CanalDeVenta, EsReferido,
@@ -374,6 +367,46 @@ END;
 //
 DELIMITER ;
 
+DELIMITER //
+CREATE TRIGGER historyPromotor
+AFTER UPDATE ON Leads
+FOR EACH ROW
+BEGIN
+    DECLARE idPromotor INT;
+    DECLARE PromotorNombre VARCHAR(255);
+    DECLARE idPromotorActual INT;
+    DECLARE PromotorNombreActual VARCHAR(255);
+
+    -- Verificar si PromotorOriginal cambió
+    IF NEW.PromotorOriginal is not null and OLD.PromotorOriginal is null THEN
+        -- Obtener el valor actual de PromotorOriginal
+        SET idPromotor = NEW.PromotorOriginal;
+
+        -- Obtener el nombre del promotor
+        SELECT Nombre INTO PromotorNombre FROM promotor WHERE PromotorID = idPromotor;
+
+        -- Insertar en la tabla de reasignaciones
+        INSERT INTO Reasignaciones (LeadID, NombrePromotor, FechaReasignacion)
+        VALUES (OLD.LeadID, PromotorNombre, CURRENT_TIMESTAMP());
+    END IF;
+    
+    IF NEW.PromotorActual is not null and OLD.PromotorActual is null THEN
+        -- Obtener el valor actual de PromotorOriginal
+        SET idPromotorActual = NEW.PromotorActual;
+
+        -- Obtener el nombre del promotor
+        SELECT Nombre INTO PromotorNombreActual FROM promotor WHERE PromotorID = idPromotorActual;
+
+        -- Insertar en la tabla de reasignaciones
+        INSERT INTO Reasignaciones (LeadID, NombrePromotor, FechaReasignacion)
+        VALUES (OLD.LeadID, PromotorNombreActual, CURRENT_TIMESTAMP());
+    END IF;
+END;
+//
+DELIMITER ;
+
+
+
 -- Select de los leads
 SELECT leads.NombreCompleto, leads.telefono,leads.telefono2, leads.CorreoElectronico, leads.CorreoElectronico2, leads.FechaPrimerContacto,
 leads.FechaNac, leads.EscuelaProcedencia, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.PSeguimiento, leads.Grado,
@@ -386,7 +419,7 @@ LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID
 LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID
 LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID
 LEFT JOIN Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID
-LEFT JOIN Promotor PromotorAct ON leads.PromotorOriginal = PromotorAct.PromotorID;
+LEFT JOIN Promotor PromotorAct ON leads.PromotorActual = PromotorAct.PromotorID;
 
 select leads.NombreCompleto, contacto.FechaContacto, contacto.Comentario from Contacto left join leads on Contacto.LeadID = leads.LeadID where Contacto.LeadID = 2;
 
