@@ -3,19 +3,35 @@ const router = express.Router();
 const pool = require('../db.js');
 
 // Obtener todos los promotores
+// Obtener todos los promotores o filtrar por nombre
 router.get('/', async (req, res) => {
   try {
-    const listPromotores = await pool.query('SELECT * FROM Promotor');
-    res.json({
-      status: 200,
-      message: 'Se ha listado correctamente',
-      listPromotores: listPromotores,
-    });
+    let query = 'SELECT * FROM Promotor';
+
+    // Verificar si se proporciona un parámetro de búsqueda por nombre
+    if (req.query.nombre) {
+      const nombre = `%${req.query.nombre}%`; // Añadir comodines para buscar coincidencias parciales
+      query += ' WHERE Nombre LIKE ?';
+      const listPromotores = await pool.query(query, [nombre]);
+      res.json({
+        status: 200,
+        message: 'Se ha listado correctamente',
+        listPromotores: listPromotores,
+      });
+    } else {
+      const listPromotores = await pool.query(query);
+      res.json({
+        status: 200,
+        message: 'Se ha listado correctamente',
+        listPromotores: listPromotores,
+      });
+    }
   } catch (error) {
     console.error('Error al obtener la lista de promotores:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
+
 
 // Obtener promotores activos
 router.get('/activos/:id', async (req, res) => {
