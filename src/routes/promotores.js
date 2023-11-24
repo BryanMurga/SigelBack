@@ -18,9 +18,10 @@ router.get('/', async (req, res) => {
 });
 
 // Obtener promotores activos
-router.get('/activos', async (req, res) => {
+router.get('/activos/:id', async (req, res) => {
+  const { id } = req.params;
   try {
-    const promotoresActivos = await pool.query('SELECT PromotorID, Nombre FROM Promotor WHERE Estado = ?', [1]);
+    const promotoresActivos = await pool.query('SELECT Promotor.PromotorID, Promotor.Nombre FROM Promotor LEFT JOIN leads ON Promotor.PromotorID = leads.PromotorActual AND leads.LeadID = ? WHERE promotor.Estado = 1 and leads.PromotorActual IS NULL;', [id]);
     if (promotoresActivos.length === 0) {
       return res.status(404).json({ error: 'No se encontraron promotores activos' });
     }
@@ -33,7 +34,25 @@ router.get('/activos', async (req, res) => {
     console.error('Error al obtener promotores activos:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
-});
+});;
+
+router.get('/activos/all', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const promotoresActivos = await pool.query('SELECT * promotores where estado = 1');
+    if (promotoresActivos.length === 0) {
+      return res.status(404).json({ error: 'No se encontraron promotores activos' });
+    }
+    res.json({
+      status: 200,
+      message: 'Se han obtenido los promotores activos correctamente',
+      promotores: promotoresActivos,
+    });
+  } catch (error) {
+    console.error('Error al obtener promotores activos:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});;
 
 // Obtener un promotor por su ID
 router.get('/:id', async (req, res) => {
