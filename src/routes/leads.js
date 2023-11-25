@@ -232,6 +232,22 @@ router.get('/contacto/:id', async (req, res) => {
   } 
 });
 
+router.get('/historial-reasignacion/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const historial = await pool.query('select NombrePromotor, FechaReasignacion from Reasignaciones where LeadID = ?;', [id]);
+    res.json({
+      status: 200,
+      message: 'Se ha obtenido el historial de promotores correctamente',
+      historial: historial,
+    });
+  } catch (error) { 
+    console.error('Error al obtener el historial:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  } 
+});
+
 
 
 
