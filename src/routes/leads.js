@@ -81,7 +81,7 @@ router.post('/create', async (req, res) => {
   } = req.body;
 
   // Validar campos obligatorios
-  if (!NombreCompleto || !Telefono || !CorreoElectronico || !FechaPrimerContacto || !CarreraInteresID) {
+  if (!NombreCompleto || !Telefono || !CorreoElectronico || !CarreraInteresID) {
     return res.status(400).json({ error: 'Todos los campos obligatorios deben estar presentes' });
   }
 
