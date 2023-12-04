@@ -234,13 +234,13 @@ INSERT INTO Leads (NombreCompleto, Telefono, Telefono2, CorreoElectronico, Corre
 EscuelaProcedencia, NombrePais, NombreEstado, NombreCiudad, PSeguimiento, CarreraInteresID, Grado, Programa, EstatusInsc, SemestreIngreso, Ciclo, CampanaID,
 AsetNameForm, IsOrganic, MedioDeContactoID, TipoReferido, NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista,
 PromotorOriginal, FechaPromotorOriginal, PromotorActual, FechaPromotorActual, Comentarios, Contacto) VALUES
-('Carlos Rodríguez', '555-1111', NULL, 'carlos@example.com', NULL, '2023-01-15', '2002-03-10', 'Escuela A', 'México', 'Ciudad de México', 'Benito Juárez',
+('Carlos Rodríguez', '555-1111', NULL, 'carlos@example.com', NULL, null, '2002-03-10', 'Escuela A', 'México', 'Ciudad de México', 'Benito Juárez',
   'P-PROSPECTO', 1, 'BACHILLERATO', 'LDI', 'INSC', '1 Semestre', '2023A', 1, 'Formulario1', 'PAUTA', 2, 'PERSONAL UNINTER', 'Juan Pérez', 'B_POSGRADOS',
   '2023-02-01', 1, 0.00, 101, NULL, NULL, NULL, NULL, NULL, NULL),
-('Ana Gómez', '555-2222', '555-3333', 'ana@example.com', 'ana2@example.com', '2023-02-10', '1998-11-25', 'Escuela B', 'México', 'Estado de México', 'Toluca',
+('Ana Gómez', '555-2222', '555-3333', 'ana@example.com', 'ana2@example.com', null, '1998-11-25', 'Escuela B', 'México', 'Estado de México', 'Toluca',
   'PS-SEGUIMIENTO', 2, 'LIC/ING', 'PEDAGOGÍA', 'REZA', '2 Semestre', '2023A', 2, 'Formulario2', 'ORGÁNICO', 1, 'ESTUDIANTE', 'María Gómez', 'REDES SOCIALES META INSTAGRAM',
   '2023-03-01', 2, 300.00, 102, 1, '2023-02-15', 2, '2023-03-01', 'Comentario sobre la situación', 2),
-  ('Bryan Murga', '7771301194', '555-3333', 'bryan@example.com', 'bryan2@example.com', '2023-02-10', '1998-11-25', 'Escuela B', 'México', 'Estado de México', 'Toluca',
+  ('Bryan Murga', '7771301194', '555-3333', 'bryan@example.com', 'bryan2@example.com', null, '1998-11-25', 'Escuela B', 'México', 'Estado de México', 'Toluca',
   'PS-SEGUIMIENTO', 2, 'LIC/ING', 'SIU', 'REZA', '2 Semestre', '2023A', 2, 'Formulario2', 'ORGÁNICO', 1, 'ESTUDIANTE', 'María Gómez', 'REDES SOCIALES META INSTAGRAM',
   '2023-03-01', 2, 300.00, 102, 1, '2023-02-15', 2, '2023-03-01', 'Comentario sobre la situación', 2);
   
@@ -390,7 +390,7 @@ BEGIN
         VALUES (OLD.LeadID, PromotorNombre, CURRENT_TIMESTAMP());
     END IF;
     
-    IF NEW.PromotorActual is not null and OLD.PromotorActual is null THEN
+    IF NEW.PromotorActual <> OLD.PromotorActual THEN
         -- Obtener el valor actual de PromotorOriginal
         SET idPromotorActual = NEW.PromotorActual;
 
@@ -423,3 +423,98 @@ LEFT JOIN Promotor PromotorAct ON leads.PromotorActual = PromotorAct.PromotorID;
 
 select leads.NombreCompleto, contacto.FechaContacto, contacto.Comentario from Contacto left join leads on Contacto.LeadID = leads.LeadID where Contacto.LeadID = 2;
 
+select * from reasignaciones;
+use apis4;
+SELECT Promotor.PromotorID, Promotor.Nombre FROM Promotor LEFT JOIN leads ON Promotor.PromotorID = leads.PromotorActual AND leads.LeadID = 3 WHERE promotor.Estado = 1 and leads.PromotorActual IS NULL;
+
+select * from promotor where estado = 1;
+
+select NombrePromotor, FechaReasignacion from Reasignaciones where LeadID = 1;
+
+SELECT leads.LeadID, leads.NombreCompleto, leads.telefono,leads.telefono2, leads.CorreoElectronico, leads.CorreoElectronico2, leads.FechaPrimerContacto,leads.FechaNac, leads.EscuelaProcedencia, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.PSeguimiento, leads.Grado,leads.EstatusInsc,leads.SemestreIngreso, leads.Ciclo, leads.AsetNameForm, leads.IsOrganic, leads.TipoReferido, leads.NombreReferido, leads.DondeObtDato, leads.FechaInscripcion, leads.BecaOfrecida, leads.NumeroLista, leads.FechaPromotorOriginal, leads.FechaPromotorActual, leads.Comentarios, leads.Programa, leads.FechaPromotorOriginal, CarrerasInt.Nombre as CarreraInteres,  Campana.Nombre as NombreCampana, MedioDeContacto.Nombre as MedioContacto, CarreraIns.Nombre as CarreraInscrita, PromotorOri.Nombre as NombrePromotorOri, PromotorAct.Nombre as NombrePromotorAct from leads LEFT JOIN Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID LEFT JOIN Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID LEFT JOIN Promotor PromotorAct ON leads.PromotorActual = PromotorAct.PromotorID where datediff(curdate(), leads.FechaPromotorActual) >=3 AND FechaPrimerContacto IS NULL and PromotorOriginal IS NOT NULL;
+
+	DELIMITER //
+
+CREATE PROCEDURE UpdateVariosRegistros (
+    IN leads_json JSON
+)
+BEGIN
+    DECLARE id_val INT;
+    DECLARE nuevo_valor_json JSON;
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE cur CURSOR FOR SELECT id, nuevo_valor FROM json_table(leads_json, '$[*]' COLUMNS(id INT PATH '$.id', nuevo_valor JSON PATH '$.nuevosValores'));
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+    OPEN cur;
+    read_loop: LOOP
+        FETCH cur INTO id_val, nuevo_valor_json;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        UPDATE leads
+        SET 
+			EscuelaProcedencia = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.EscuelaProcedencia')), EscuelaProcedencia),
+			NombrePais = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.NombrePais')), NombrePais),
+			NombreEstado = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.NombreEstado')), NombreEstado),
+			NombreCiudad = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.NombreCiudad')), NombreCiudad),
+			PSeguimiento = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.PSeguimiento')), PSeguimiento),
+			CarreraInteresID = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.CarreraInteresID')), CarreraInteresID),
+			Grado = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.Grado')), Grado),
+			Programa = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.Programa')), Programa),
+			EstatusInsc = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.EstatusInsc')), EstatusInsc),
+			SemestreIngreso = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.SemestreIngreso')), SemestreIngreso),
+			Ciclo = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.Ciclo')), Ciclo),
+			CampanaID = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.CampanaID')), CampanaID),
+			AsetNameForm = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.AsetNameForm')), AsetNameForm),
+			IsOrganic = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.IsOrganic')), IsOrganic),
+			MedioDeContactoID = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.MedioDeContactoID')), MedioDeContactoID)
+        WHERE id = id_val;
+    END LOOP;
+    CLOSE cur;
+END //
+
+DELIMITER ;
+
+-- Insert de las carreras
+
+INSERT INTO carreras (CarreraID, Nombre)
+VALUES
+    (1, 'Psicología (LPS)'),
+    (2, 'Derecho (LED)'),
+    (3, 'Pedagogía (LPE)'),
+    (4, 'Ciencias Políticas y Gestión Pública (LCP)'),
+    (5, 'Relaciones Internacionales (LRI)'),
+    (6, 'Relaciones Internacionales y Economía (RIEC)'),
+    (7, 'Relaciones Internacionales y Ciencias Políticas (RICP)'),
+    (8, 'Idiomas (LID)'),
+    (9, 'Comunicación (LCO)'),
+    (10, 'Comunicación y Relaciones Públicas (CORP)'),
+    (11, 'Comercio Exterior (LCE)'),
+    (12, 'Economía y Finanzas (LEF)'),
+    (13, 'Mercadotecnia (LEM)'),
+    (14, 'Mercadotecnia y Publicidad (LEMP)'),
+    (15, 'Psicología Organizacional (LPO)'),
+    (16, 'Administración de Empresas Turísticas (LAET)'),
+    (17, 'Administración de Empresas (LAE)'),
+    (18, 'Administración de Negocios Internacionales (LANI)'),
+    (19, 'Administración Pública (LAP)'),
+    (20, 'Administración y Mercadotecnia (LAM)'),
+    (21, 'Diseño de Modas y Tendencias Internacionales (LDM)'),
+    (22, 'Diseño Industrial (LDI)'),
+    (23, 'Diseño Gráfico (LDG)'),
+    (24, 'Animación y Diseño Digital (LADD)'),
+    (25, 'Arquitectura (ARQ)'),
+    (26, 'Civil (ICI)'),
+    (27, 'Mecatrónica (IME)'),
+    (28, 'Mecánica Industrial (IMI)'),
+    (29, 'Industrial y de Sistemas de Calidad (IISCA)'),
+    (30, 'Sistemas Computacionales (ISC)'),
+    (31, 'Ambiental (IAM)'),
+    (32, 'Gestión Empresarial (LEGE)'),
+    (33, 'Mercadotecnia (LEMK)'),
+    (34, 'Administración de Negocios Internacionales (LEANI)'),
+    (35, 'Administración y Mercadotecnia (LEAM)'),
+    (36, 'Mercadotecnia y Publicidad (LEMKP)'),
+    (37, 'Comercio Exterior (LECE)');
+SELECT * FROM apis4.carreras;

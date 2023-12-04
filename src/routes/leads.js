@@ -187,7 +187,7 @@ router.put('/update/:id', async (req, res) => {
     EstatusInsc, SemestreIngreso, Ciclo, CampanaID, AsetNameForm, IsOrganic, MedioDeContactoID, TipoReferido,
     NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista, PromotorOriginal,
     FechaPromotorOriginal, PromotorActual, FechaPromotorActual, Comentarios, Contacto,
-    id
+    id  
   ];
 
   try {
