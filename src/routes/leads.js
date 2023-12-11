@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db.js');
 
+
 // Obtener todos los leads
 
-router.get('/', async (req, res) => { 
+router.get('/', async (req, res) => {
 
   try {
     const leads = await pool.query('SELECT leads.LeadID, leads.NombreCompleto, leads.telefono,leads.telefono2, leads.CorreoElectronico, leads.CorreoElectronico2, leads.FechaPrimerContacto,leads.FechaNac, leads.EscuelaProcedencia, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.PSeguimiento, leads.Grado,leads.EstatusInsc,leads.SemestreIngreso, leads.Ciclo, leads.AsetNameForm, leads.IsOrganic, leads.TipoReferido, leads.NombreReferido, leads.DondeObtDato, leads.FechaInscripcion, leads.BecaOfrecida, leads.NumeroLista, leads.FechaPromotorOriginal, leads.FechaPromotorActual, leads.Comentarios, leads.Programa, CarrerasInt.Nombre as CarreraInteres,  Campana.Nombre as NombreCampana, MedioDeContacto.Nombre as MedioContacto, CarreraIns.Nombre as CarreraInscrita, PromotorOri.Nombre as NombrePromotorOri, PromotorAct.Nombre as NombrePromotorAct from leads LEFT JOIN Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID LEFT JOIN Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID LEFT JOIN Promotor PromotorAct ON leads.PromotorActual = PromotorAct.PromotorID;');
@@ -16,7 +17,7 @@ router.get('/', async (req, res) => {
   } catch (error) {
     console.error('Error al obtener los leads:', error);
     res.status(500).json({ error: 'Error en el servidor' });
-  } 
+  }
 });
 
 router.get('/asignacion', async (req, res) => {
@@ -31,7 +32,7 @@ router.get('/asignacion', async (req, res) => {
   } catch (error) {
     console.error('Error al obtener los leads:', error);
     res.status(500).json({ error: 'Error en el servidor' });
-  } 
+  }
 });
 
 // Obtener leads con promotores asignados
@@ -47,7 +48,7 @@ router.get('/reasignacion', async (req, res) => {
   } catch (error) {
     console.error('Error al obtener los leads:', error);
     res.status(500).json({ error: 'Error en el servidor' });
-  } 
+  }
 });
 
 // Obtener un lead por su ID
@@ -109,7 +110,6 @@ router.post('/create', async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
-
 // Actualizar solo el campo Promotor Original de un lead por su ID
 router.put('/update-promotor/:id', async (req, res) => {
   const { id } = req.params;
@@ -120,9 +120,9 @@ router.put('/update-promotor/:id', async (req, res) => {
     return res.status(400).json({ error: 'El campo Promotor Original es obligatorio' });
   }
 
-  const fechaActual = new Date().toISOString().slice(0, 19).replace('T', ' ');  
-  const query = 'UPDATE Leads SET PromotorOriginal = ?, FechaPromotorOriginal = ? WHERE LeadID = ?';
-  const values = [PromotorOriginal,fechaActual, id];
+  const fechaActual = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  const query = 'UPDATE Leads SET PromotorOriginal = ?, FechaPromotorOriginal = ?, PromotorActual = ?, FechaPromotorActual = ? WHERE LeadID = ?';
+  const values = [PromotorOriginal, fechaActual,PromotorOriginal, fechaActual, id];
 
   try {
     await pool.query(query, values);
@@ -143,9 +143,9 @@ router.put('/update-promotor-actual/:id', async (req, res) => {
     return res.status(400).json({ error: 'El campo Promotor Actual es obligatorio' });
   }
 
-  const fechaActual = new Date().toISOString().slice(0, 19).replace('T', ' ');  
+  const fechaActual = new Date().toISOString().slice(0, 19).replace('T', ' ');
   const query = `UPDATE Leads SET PromotorActual = ?, FechaPromotorActual = ? WHERE LeadID = ?`;
-  const values = [PromotorActual,fechaActual, id];
+  const values = [PromotorActual, fechaActual, id];
 
   try {
     await pool.query(query, values);
@@ -187,7 +187,7 @@ router.put('/update/:id', async (req, res) => {
     EstatusInsc, SemestreIngreso, Ciclo, CampanaID, AsetNameForm, IsOrganic, MedioDeContactoID, TipoReferido,
     NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista, PromotorOriginal,
     FechaPromotorOriginal, PromotorActual, FechaPromotorActual, Comentarios, Contacto,
-    id  
+    LeadID
   ];
 
   try {
@@ -229,7 +229,7 @@ router.get('/contacto/:id', async (req, res) => {
   } catch (error) {
     console.error('Error al obtener los leads:', error);
     res.status(500).json({ error: 'Error en el servidor' });
-  } 
+  }
 });
 
 router.get('/historial-reasignacion/:id', async (req, res) => {
@@ -242,33 +242,13 @@ router.get('/historial-reasignacion/:id', async (req, res) => {
       message: 'Se ha obtenido el historial de promotores correctamente',
       historial: historial,
     });
-  } catch (error) { 
+  } catch (error) {
     console.error('Error al obtener el historial:', error);
-    res.status(500).json({ error: 'Error en el servidor' });
-  } 
+    res.status(500).json({ error: 'Error en el servidor' }); vi
+  }
 });
 
-router.get('/update-multiple'), async (req, res) => {
-  const { leads } = req.body;
-  if (!leads || !Array.isArray(leads)) {
-    return res.status(400).json({ error: 'Formato de datos incorrecto' });
-  }
 
-  const leadsJSON = JSON.stringify(leads);
-
-  try {
-    const result = await pool.query('CALL UpdateMultipleLeads(?)', [leadsJSON]);
-    res.json({
-      status: 200,
-      message: 'Leads actualizados exitosamente',
-       result: result 
-      });
-  } catch (error) {
-    console.error('Error al actualizar los leads:', error);
-    res.status(500).json({ error: 'Error en el servidor' });
-  }
-
-} 
 
 
 
