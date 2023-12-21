@@ -87,17 +87,17 @@ CREATE TABLE Leads (
     CarreraInscripcion INT,
     BecaOfrecida DECIMAL(10, 2),
     NumeroLista INT,
-    PromotorOriginal INT,
+    promotorOriginal INT,
     FechaPromotorOriginal DATE,
-    PromotorActual INT,
+    promotorActual INT,
     FechaPromotorActual DATE,
     Comentarios TEXT,
     Contacto INT,
     FOREIGN KEY (CarreraInteresID) REFERENCES Carreras(CarreraID),
     FOREIGN KEY (CampanaID) REFERENCES Campana(CampanaID),
     FOREIGN KEY (MedioDeContactoID) REFERENCES MedioDeContacto(MedioID),
-    FOREIGN KEY (PromotorOriginal) REFERENCES Promotor(PromotorID),
-    FOREIGN KEY (PromotorActual) REFERENCES Promotor(PromotorID),
+    FOREIGN KEY (promotorOriginal) REFERENCES Promotor(PromotorID),
+    FOREIGN KEY (promotorActual) REFERENCES Promotor(PromotorID),
     FOREIGN KEY (CarreraInscripcion) REFERENCES Carreras(CarreraID)
 );
 
@@ -198,6 +198,49 @@ CREATE TABLE leadxmes_promotor (
 );
 
 
+
+INSERT INTO carreras (CarreraID, Nombre)
+VALUES
+    (1, 'Psicología (LPS)'),
+    (2, 'Derecho (LED)'),
+    (3, 'Pedagogía (LPE)'),
+    (4, 'Ciencias Políticas y Gestión Pública (LCP)'),
+    (5, 'Relaciones Internacionales (LRI)'),
+    (6, 'Relaciones Internacionales y Economía (RIEC)'),
+    (7, 'Relaciones Internacionales y Ciencias Políticas (RICP)'),
+    (8, 'Idiomas (LID)'),
+    (9, 'Comunicación (LCO)'),
+    (10, 'Comunicación y Relaciones Públicas (CORP)'),
+    (11, 'Comercio Exterior (LCE)'),
+    (12, 'Economía y Finanzas (LEF)'),
+    (13, 'Mercadotecnia (LEM)'),
+    (14, 'Mercadotecnia y Publicidad (LEMP)'),
+    (15, 'Psicología Organizacional (LPO)'),
+    (16, 'Administración de Empresas Turísticas (LAET)'),
+    (17, 'Administración de Empresas (LAE)'),
+    (18, 'Administración de Negocios Internacionales (LANI)'),
+    (19, 'Administración Pública (LAP)'),
+    (20, 'Administración y Mercadotecnia (LAM)'),
+    (21, 'Diseño de Modas y Tendencias Internacionales (LDM)'),
+    (22, 'Diseño Industrial (LDI)'),
+    (23, 'Diseño Gráfico (LDG)'),
+    (24, 'Animación y Diseño Digital (LADD)'),
+    (25, 'Arquitectura (ARQ)'),
+    (26, 'Civil (ICI)'),
+    (27, 'Mecatrónica (IME)'),
+    (28, 'Mecánica Industrial (IMI)'),
+    (29, 'Industrial y de Sistemas de Calidad (IISCA)'),
+    (30, 'Sistemas Computacionales (ISC)'),
+    (31, 'Ambiental (IAM)'),
+    (32, 'Gestión Empresarial (LEGE)'),
+    (33, 'Mercadotecnia (LEMK)'),
+    (34, 'Administración de Negocios Internacionales (LEANI)'),
+    (35, 'Administración y Mercadotecnia (LEAM)'),
+    (36, 'Mercadotecnia y Publicidad (LEMKP)'),
+    (37, 'Comercio Exterior (LECE)');
+SELECT * FROM apis4.carreras;
+
+
 -- Inserciones para la tabla "Promotor"
 INSERT INTO Promotor (Nombre, Correo, Passw, Telefono, Estado) VALUES
 ('Juan Pérez', 'juan@example.com', 'password123', '555-1234', TRUE),
@@ -292,6 +335,8 @@ END;
 //
 DELIMITER ;
 
+
+
 DELIMITER //
 CREATE TRIGGER actualizar_conteo_leadxpromotor
 AFTER INSERT ON leads
@@ -367,6 +412,8 @@ END;
 //
 DELIMITER ;
 
+
+
 DELIMITER //
 CREATE TRIGGER historyPromotor
 AFTER UPDATE ON Leads
@@ -438,6 +485,7 @@ SELECT leads.LeadID, leads.NombreCompleto, leads.telefono,leads.telefono2, leads
 CREATE PROCEDURE UpdateVariosRegistros (
     IN leads_json JSON
 )
+
 BEGIN
     DECLARE id_val INT;
     DECLARE nuevo_valor_json JSON;
@@ -478,43 +526,3 @@ DELIMITER ;
 
 -- Insert de las carreras
 
-INSERT INTO carreras (CarreraID, Nombre)
-VALUES
-    (1, 'Psicología (LPS)'),
-    (2, 'Derecho (LED)'),
-    (3, 'Pedagogía (LPE)'),
-    (4, 'Ciencias Políticas y Gestión Pública (LCP)'),
-    (5, 'Relaciones Internacionales (LRI)'),
-    (6, 'Relaciones Internacionales y Economía (RIEC)'),
-    (7, 'Relaciones Internacionales y Ciencias Políticas (RICP)'),
-    (8, 'Idiomas (LID)'),
-    (9, 'Comunicación (LCO)'),
-    (10, 'Comunicación y Relaciones Públicas (CORP)'),
-    (11, 'Comercio Exterior (LCE)'),
-    (12, 'Economía y Finanzas (LEF)'),
-    (13, 'Mercadotecnia (LEM)'),
-    (14, 'Mercadotecnia y Publicidad (LEMP)'),
-    (15, 'Psicología Organizacional (LPO)'),
-    (16, 'Administración de Empresas Turísticas (LAET)'),
-    (17, 'Administración de Empresas (LAE)'),
-    (18, 'Administración de Negocios Internacionales (LANI)'),
-    (19, 'Administración Pública (LAP)'),
-    (20, 'Administración y Mercadotecnia (LAM)'),
-    (21, 'Diseño de Modas y Tendencias Internacionales (LDM)'),
-    (22, 'Diseño Industrial (LDI)'),
-    (23, 'Diseño Gráfico (LDG)'),
-    (24, 'Animación y Diseño Digital (LADD)'),
-    (25, 'Arquitectura (ARQ)'),
-    (26, 'Civil (ICI)'),
-    (27, 'Mecatrónica (IME)'),
-    (28, 'Mecánica Industrial (IMI)'),
-    (29, 'Industrial y de Sistemas de Calidad (IISCA)'),
-    (30, 'Sistemas Computacionales (ISC)'),
-    (31, 'Ambiental (IAM)'),
-    (32, 'Gestión Empresarial (LEGE)'),
-    (33, 'Mercadotecnia (LEMK)'),
-    (34, 'Administración de Negocios Internacionales (LEANI)'),
-    (35, 'Administración y Mercadotecnia (LEAM)'),
-    (36, 'Mercadotecnia y Publicidad (LEMKP)'),
-    (37, 'Comercio Exterior (LECE)');
-SELECT * FROM apis4.carreras;
