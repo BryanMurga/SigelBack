@@ -39,17 +39,17 @@ router.get('/:id', async (req, res) => {
 
 // Crear un nuevo contacto
 router.post('/create', async (req, res) => {
-  const { FechaContacto, Comentario } = req.body;
+  const { LeadID, FechaContacto, Comentario, nombrePromotor } = req.body;
 
   if (!FechaContacto || !Comentario) {
     return res.status(400).json({ error: 'Todos los campos obligatorios deben estar presentes' });
   }
 
-  const query = 'INSERT INTO Contacto (FechaContacto, Comentario) VALUES (?, ?)';
+  const query = 'INSERT INTO Contacto (LeadID, FechaContacto, Comentario, nombrePromotor) VALUES (?, ?, ?, ?)';
 
   try {
-    const result = await pool.query(query, [FechaContacto, Comentario]);
-    res.json({ status: 200, message: 'Contacto creado exitosamente', insertedId: result.insertId });
+    const result = await pool.query(query, [LeadID, FechaContacto, Comentario, nombrePromotor]);
+    res.json({ status: 200, message: 'Contacto creado exitosamente'});
   } catch (error) {
     console.error('Error al crear el contacto:', error);
     res.status(500).json({ error: 'Error en el servidor' });

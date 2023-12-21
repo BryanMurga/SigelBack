@@ -32,6 +32,84 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/leads', async (req, res) => {
+  // Obtén el valor de userName de los parámetros de consulta (query parameters)
+  const userName = req.query.userName;
+
+  if (!userName) {
+    return res.status(400).json({ error: 'Se requiere el parámetro userName en el cuerpo de la solicitud' });
+  }
+
+  const query = `
+      SELECT
+        leads.LeadID,
+        leads.NombreCompleto,
+        leads.telefono,
+        leads.telefono2,
+        leads.CorreoElectronico,
+        leads.CorreoElectronico2,
+        leads.FechaPrimerContacto,
+        leads.FechaNac,
+        leads.EscuelaProcedencia,
+        leads.NombrePais,
+        leads.NombreEstado,
+        leads.NombreCiudad,
+        leads.PSeguimiento,
+        leads.Grado,  
+        leads.EstatusInsc,
+        leads.SemestreIngreso,
+        leads.Ciclo,
+        leads.AsetNameForm,
+        leads.IsOrganic,
+        leads.TipoReferido,
+        leads.NombreReferido,
+        leads.DondeObtDato,
+        leads.FechaInscripcion,
+        leads.BecaOfrecida,
+        leads.NumeroLista,
+        leads.FechaPromotorOriginal,
+        leads.FechaPromotorActual,
+        leads.Comentarios,
+        leads.Programa,
+        CarrerasInt.Nombre as CarreraInteres,
+        Campana.Nombre as NombreCampana,
+        MedioDeContacto.Nombre as MedioContacto,
+        CarreraIns.Nombre as CarreraInscrita,
+        PromotorOri.Nombre as NombrePromotorOri,
+        PromotorAct.Nombre as NombrePromotorAct
+      FROM
+        leads
+      LEFT JOIN
+        Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID
+      LEFT JOIN
+        Campana ON leads.CampanaID = Campana.CampanaID
+      LEFT JOIN
+        MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID
+      LEFT JOIN
+        Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID
+      LEFT JOIN
+        Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID
+      LEFT JOIN
+        Promotor PromotorAct ON leads.PromotorActual = PromotorAct.PromotorID
+      LEFT JOIN
+        users ON PromotorAct.PromotorID = users.promotorId
+      WHERE
+        users.userName = ?;
+    `;
+
+  const valores = [userName];
+  try {
+    const leads = await pool.query(query, valores);
+    res.json({ 
+      status: 200, 
+      message: 'Lead listado exitosamente', 
+      leads: leads });
+  } catch (error) {
+    console.error('Error al obtener los leads:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
 
 // Obtener promotores activos
 router.get('/activos/:id', async (req, res) => {
@@ -94,7 +172,7 @@ router.get('/:id', async (req, res) => {
 router.post('/create', async (req, res) => {
   const { Nombre, Correo, Telefono, Passw } = req.body;
 
-  if (!Nombre || !Correo || !Telefono || !Passw ) {
+  if (!Nombre || !Correo || !Telefono || !Passw) {
     return res.status(400).json({ error: 'Todos los campos obligatorios deben estar presentes' });
   }
 

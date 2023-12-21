@@ -220,7 +220,7 @@ router.get('/contacto/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const contacto = await pool.query('select leads.NombreCompleto, contacto.FechaContacto, contacto.Comentario from Contacto left join leads on Contacto.LeadID = leads.LeadID where Contacto.LeadID = ?;', [id]);
+    const contacto = await pool.query('select leads.NombreCompleto, contacto.FechaContacto, contacto.Comentario, contacto.LeadID, contacto.nombrePromotor from Contacto left join leads on Contacto.LeadID = leads.LeadID where Contacto.LeadID = ?;', [id]);
     res.json({
       status: 200,
       message: 'Se ha obtenido los comentarios del lead correctamente',
