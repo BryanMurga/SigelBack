@@ -44,9 +44,10 @@ CREATE TABLE users(
     userName VARCHAR(30) NOT NULL,
     email VARCHAR(30),
     password VARCHAR(30) NOT NULL,
-    role ENUM('admin','promotor','coordinador')
+    role ENUM('admin','promotor','coordinador'),
+    promotorId int,
+    FOREIGN KEY (promotorId) REFERENCES Promotor(PromotorID)
 );
-
 
 -- Crear la tabla "Leads"
 CREATE TABLE Leads (
@@ -184,6 +185,7 @@ CREATE TABLE ListaComision (
 );
 
 -- Trigger para saber la cantidad de regisros por mes de los leads
+
 CREATE TABLE leadxmes (
     mes INT,
     anio INT,
@@ -309,6 +311,7 @@ PromocionInscripcion, NumTelefonicoAlumno, CorreoElectronicoProspecto, FechaNaci
   2, 'CORREO', 'ESTUDIANTE', 'EGRESADO', '555-8888', 'alumno2@example.com', '1998-08-20');
 
 
+-- EJECUTAR HASTA AQUI LA BASE DE DATOS, POSTERIORMENTE EJECUTAR LOS TRIGGERS
 
 DELIMITER //
 CREATE TRIGGER actualizar_conteo
@@ -347,7 +350,7 @@ BEGIN
     DECLARE promotor_insert VARCHAR(255);
     SET mes_insert = MONTH(NEW.FechaPrimerContacto); -- Suponiendo que tienes una columna llamada "fecha" en tu tabla
     SET anio_insert = YEAR(NEW.FechaPrimerContacto);
-    SET promotor_insert = NEW.PromotorActual;
+    SET promotor_insert = NEW.promotorActual;
 
     -- Verificar si ya existe un registro para el mes y año actual
     IF EXISTS (SELECT * FROM leadxmes_promotor WHERE mes = mes_insert AND anio = anio_insert AND promotorActual =  promotor_insert ) THEN
@@ -376,14 +379,14 @@ BEGIN
         IF NOT EXISTS (SELECT * FROM Alumnos WHERE LeadID = NEW.LeadID) THEN
             -- Insertar un nuevo registro en la tabla Alumnos
             INSERT INTO Alumnos (LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, Estatus, CarreraInscripcion )
-            VALUES (NEW.LeadID, NEW.NombreCompleto, NEW.Telefono, NEW.EscuelaProcedencia, NEW.PromotorActual, NEW.EstatusInsc, NEW.CarreraInscripcion);
+            VALUES (NEW.LeadID, NEW.NombreCompleto, NEW.Telefono, NEW.EscuelaProcedencia, NEW.promotorActual, NEW.EstatusInsc, NEW.CarreraInscripcion);
         ELSE
             -- Actualizar el registro existente en la tabla Alumnos
             UPDATE Alumnos
             SET Nombre = NEW.NombreCompleto,
                 Telefono = NEW.Telefono,
                 EscuelaProcedencia = NEW.EscuelaProcedencia,
-                PromotorID = NEW.PromotorActual,
+                PromotorID = NEW.promotorActual,
                 Estatus = NEW.EstatusInsc,
                 CarreraInscripcion = NEW.CarreraInscripcion
             WHERE LeadID = NEW.LeadID;
@@ -425,9 +428,9 @@ BEGIN
     DECLARE PromotorNombreActual VARCHAR(255);
 
     -- Verificar si PromotorOriginal cambió
-    IF NEW.PromotorOriginal is not null and OLD.PromotorOriginal is null THEN
+    IF NEW.promotorOriginal is not null and OLD.promotorOriginal is null THEN
         -- Obtener el valor actual de PromotorOriginal
-        SET idPromotor = NEW.PromotorOriginal;
+        SET idPromotor = NEW.promotorOriginal;
 
         -- Obtener el nombre del promotor
         SELECT Nombre INTO PromotorNombre FROM promotor WHERE PromotorID = idPromotor;
@@ -437,9 +440,9 @@ BEGIN
         VALUES (OLD.LeadID, PromotorNombre, CURRENT_TIMESTAMP());
     END IF;
     
-    IF NEW.PromotorActual <> OLD.PromotorActual THEN
+    IF NEW.promotorActual <> OLD.promotorActual THEN
         -- Obtener el valor actual de PromotorOriginal
-        SET idPromotorActual = NEW.PromotorActual;
+        SET idPromotorActual = NEW.promotorActual;
 
         -- Obtener el nombre del promotor
         SELECT Nombre INTO PromotorNombreActual FROM promotor WHERE PromotorID = idPromotorActual;
@@ -481,48 +484,6 @@ select NombrePromotor, FechaReasignacion from Reasignaciones where LeadID = 1;
 SELECT leads.LeadID, leads.NombreCompleto, leads.telefono,leads.telefono2, leads.CorreoElectronico, leads.CorreoElectronico2, leads.FechaPrimerContacto,leads.FechaNac, leads.EscuelaProcedencia, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.PSeguimiento, leads.Grado,leads.EstatusInsc,leads.SemestreIngreso, leads.Ciclo, leads.AsetNameForm, leads.IsOrganic, leads.TipoReferido, leads.NombreReferido, leads.DondeObtDato, leads.FechaInscripcion, leads.BecaOfrecida, leads.NumeroLista, leads.FechaPromotorOriginal, leads.FechaPromotorActual, leads.Comentarios, leads.Programa, leads.FechaPromotorOriginal, CarrerasInt.Nombre as CarreraInteres,  Campana.Nombre as NombreCampana, MedioDeContacto.Nombre as MedioContacto, CarreraIns.Nombre as CarreraInscrita, PromotorOri.Nombre as NombrePromotorOri, PromotorAct.Nombre as NombrePromotorAct from leads LEFT JOIN Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID LEFT JOIN Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID LEFT JOIN Promotor PromotorAct ON leads.PromotorActual = PromotorAct.PromotorID where datediff(curdate(), leads.FechaPromotorActual) >=3 AND FechaPrimerContacto IS NULL and PromotorOriginal IS NOT NULL;
 
 	DELIMITER //
-
-CREATE PROCEDURE UpdateVariosRegistros (
-    IN leads_json JSON
-)
-
-BEGIN
-    DECLARE id_val INT;
-    DECLARE nuevo_valor_json JSON;
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE cur CURSOR FOR SELECT id, nuevo_valor FROM json_table(leads_json, '$[*]' COLUMNS(id INT PATH '$.id', nuevo_valor JSON PATH '$.nuevosValores'));
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-    OPEN cur;
-    read_loop: LOOP
-        FETCH cur INTO id_val, nuevo_valor_json;
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-
-        UPDATE leads
-        SET 
-			EscuelaProcedencia = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.EscuelaProcedencia')), EscuelaProcedencia),
-			NombrePais = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.NombrePais')), NombrePais),
-			NombreEstado = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.NombreEstado')), NombreEstado),
-			NombreCiudad = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.NombreCiudad')), NombreCiudad),
-			PSeguimiento = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.PSeguimiento')), PSeguimiento),
-			CarreraInteresID = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.CarreraInteresID')), CarreraInteresID),
-			Grado = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.Grado')), Grado),
-			Programa = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.Programa')), Programa),
-			EstatusInsc = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.EstatusInsc')), EstatusInsc),
-			SemestreIngreso = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.SemestreIngreso')), SemestreIngreso),
-			Ciclo = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.Ciclo')), Ciclo),
-			CampanaID = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.CampanaID')), CampanaID),
-			AsetNameForm = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.AsetNameForm')), AsetNameForm),
-			IsOrganic = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.IsOrganic')), IsOrganic),
-			MedioDeContactoID = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.MedioDeContactoID')), MedioDeContactoID)
-        WHERE id = id_val;
-    END LOOP;
-    CLOSE cur;
-END //
-
-DELIMITER ;
 
 -- Insert de las carreras
 
