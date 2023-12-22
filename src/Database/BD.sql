@@ -108,6 +108,7 @@ CREATE TABLE Contacto (
     LeadID int,
     FechaContacto DATE,
     Comentario VARCHAR(255),
+    NombrePromotor VARCHAR(50),
     FOREIGN KEY (LeadID) REFERENCES leads(LeadID)
 );
 
@@ -278,7 +279,7 @@ INSERT INTO users (userName, email, password, role) VALUES
 INSERT INTO Leads (NombreCompleto, Telefono, Telefono2, CorreoElectronico, CorreoElectronico2, FechaPrimerContacto, FechaNac,
 EscuelaProcedencia, NombrePais, NombreEstado, NombreCiudad, PSeguimiento, CarreraInteresID, Grado, Programa, EstatusInsc, SemestreIngreso, Ciclo, CampanaID,
 AsetNameForm, IsOrganic, MedioDeContactoID, TipoReferido, NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista,
-PromotorOriginal, FechaPromotorOriginal, PromotorActual, FechaPromotorActual, Comentarios, Contacto) VALUES
+promotorOriginal, FechaPromotorOriginal, promotorActual, FechaPromotorActual, Comentarios, Contacto) VALUES
 ('Carlos Rodríguez', '555-1111', NULL, 'carlos@example.com', NULL, null, '2002-03-10', 'Escuela A', 'México', 'Ciudad de México', 'Benito Juárez',
   'P-PROSPECTO', 1, 'BACHILLERATO', 'LDI', 'INSC', '1 Semestre', '2023A', 1, 'Formulario1', 'PAUTA', 2, 'PERSONAL UNINTER', 'Juan Pérez', 'B_POSGRADOS',
   '2023-02-01', 1, 0.00, 101, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -288,6 +289,14 @@ PromotorOriginal, FechaPromotorOriginal, PromotorActual, FechaPromotorActual, Co
   ('Bryan Murga', '7771301194', '555-3333', 'bryan@example.com', 'bryan2@example.com', null, '1998-11-25', 'Escuela B', 'México', 'Estado de México', 'Toluca',
   'PS-SEGUIMIENTO', 2, 'LIC/ING', 'SIU', 'REZA', '2 Semestre', '2023A', 2, 'Formulario2', 'ORGÁNICO', 1, 'ESTUDIANTE', 'María Gómez', 'REDES SOCIALES META INSTAGRAM',
   '2023-03-01', 2, 300.00, 102, 1, '2023-02-15', 2, '2023-03-01', 'Comentario sobre la situación', 2);
+  
+  INSERT INTO Leads (NombreCompleto, Telefono, Telefono2, CorreoElectronico, CorreoElectronico2, FechaPrimerContacto, FechaNac,
+EscuelaProcedencia, NombrePais, NombreEstado, NombreCiudad, PSeguimiento, CarreraInteresID, Grado, Programa, EstatusInsc, SemestreIngreso, Ciclo, CampanaID,
+AsetNameForm, IsOrganic, MedioDeContactoID, TipoReferido, NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista,
+promotorOriginal, FechaPromotorOriginal, promotorActual, FechaPromotorActual, Comentarios, Contacto) VALUES
+  ('Milton Murga', '7771301194', '555-3333', 'bryan@example.com', 'bryan2@example.com', null, '1998-11-25', 'Escuela B', 'México', 'Estado de México', 'Toluca',
+  'PS-SEGUIMIENTO', 2, 'LIC/ING', 'SIU', 'REZA', '2 Semestre', '2023A', 2, 'Formulario2', 'ORGÁNICO', 1, 'ESTUDIANTE', 'María Gómez', 'REDES SOCIALES META INSTAGRAM',
+  '2023-03-01', 2, 300.00, 102, 3, '2023-02-15', 3, '2023-03-01', 'Comentario sobre la situación', 2);
   
 -- Inserciones para la tabla "Contacto"
 INSERT INTO Contacto (leadID,FechaContacto, Comentario) VALUES
@@ -311,7 +320,7 @@ PromocionInscripcion, NumTelefonicoAlumno, CorreoElectronicoProspecto, FechaNaci
   2, 'CORREO', 'ESTUDIANTE', 'EGRESADO', '555-8888', 'alumno2@example.com', '1998-08-20');
 
 
--- EJECUTAR HASTA AQUI LA BASE DE DATOS, POSTERIORMENTE EJECUTAR LOS TRIGGERS
+-- EJECUTAR HASTA AQUI LA BASE DE DATOS, POSTERIORMENTE EJECUTAR LOS TRIGGERS UNO POR UNO --- IMPORTANTE
 
 DELIMITER //
 CREATE TRIGGER actualizar_conteo
@@ -338,8 +347,8 @@ END;
 //
 DELIMITER ;
 
-
-
+-- Revisar Trigger
+/*
 DELIMITER //
 CREATE TRIGGER actualizar_conteo_leadxpromotor
 AFTER INSERT ON leads
@@ -367,7 +376,10 @@ END;
 //
 DELIMITER ;
 
-SET SQL_SAFE_UPDATES = 0;
+drop trigger actualizar_conteo_leadxpromotor;
+*/
+
+SET SQL_SAFE_UPDATES = 0; --  IMPORTANTE Ejecutar intrucion
 
 DELIMITER //
 CREATE TRIGGER insert_alumnos
@@ -396,10 +408,6 @@ END;
 //
 DELIMITER ;
 
- -- DROP trigger insert_alumnos;
-
-UPDATE leads SET EstatusInsc = 'INSC' WHERE LeadID= 3;
-
 //
 DELIMITER ;
 
@@ -408,9 +416,9 @@ CREATE TRIGGER insert_users
 AFTER INSERT ON promotor
 FOR EACH ROW
 BEGIN
-     INSERT INTO users (userName, email, password, role)
-    VALUES (NEW.Nombre, NEW.Correo , NEW.Passw, 'promotor')
-    ON DUPLICATE KEY UPDATE userName = NEW.Nombre, email = NEW.Correo, password = NEW.Passw;
+     INSERT INTO users (userName, email, password, role, promotorId)
+    VALUES (NEW.Nombre, NEW.Correo , NEW.Passw, 'promotor', New.PromotorID)
+    ON DUPLICATE KEY UPDATE userName = NEW.Nombre, email = NEW.Correo, password = NEW.Passw, promotorId = NEW.PromotorID;
 END;
 //
 DELIMITER ;
@@ -468,22 +476,41 @@ LEFT JOIN Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID
 LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID
 LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID
 LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID
-LEFT JOIN Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID
-LEFT JOIN Promotor PromotorAct ON leads.PromotorActual = PromotorAct.PromotorID;
+LEFT JOIN Promotor PromotorOri ON leads.promotorOriginal = PromotorOri.PromotorID
+LEFT JOIN Promotor PromotorAct ON leads.promotorActual = PromotorAct.PromotorID;
 
 select leads.NombreCompleto, contacto.FechaContacto, contacto.Comentario from Contacto left join leads on Contacto.LeadID = leads.LeadID where Contacto.LeadID = 2;
 
 select * from reasignaciones;
 use apis4;
-SELECT Promotor.PromotorID, Promotor.Nombre FROM Promotor LEFT JOIN leads ON Promotor.PromotorID = leads.PromotorActual AND leads.LeadID = 3 WHERE promotor.Estado = 1 and leads.PromotorActual IS NULL;
+SELECT Promotor.PromotorID, Promotor.Nombre FROM Promotor LEFT JOIN leads ON Promotor.PromotorID = leads.promotorActual AND leads.LeadID = 3 WHERE promotor.Estado = 1 and leads.promotorActual IS NULL;
 
 select * from promotor where estado = 1;
 
 select NombrePromotor, FechaReasignacion from Reasignaciones where LeadID = 1;
 
-SELECT leads.LeadID, leads.NombreCompleto, leads.telefono,leads.telefono2, leads.CorreoElectronico, leads.CorreoElectronico2, leads.FechaPrimerContacto,leads.FechaNac, leads.EscuelaProcedencia, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.PSeguimiento, leads.Grado,leads.EstatusInsc,leads.SemestreIngreso, leads.Ciclo, leads.AsetNameForm, leads.IsOrganic, leads.TipoReferido, leads.NombreReferido, leads.DondeObtDato, leads.FechaInscripcion, leads.BecaOfrecida, leads.NumeroLista, leads.FechaPromotorOriginal, leads.FechaPromotorActual, leads.Comentarios, leads.Programa, leads.FechaPromotorOriginal, CarrerasInt.Nombre as CarreraInteres,  Campana.Nombre as NombreCampana, MedioDeContacto.Nombre as MedioContacto, CarreraIns.Nombre as CarreraInscrita, PromotorOri.Nombre as NombrePromotorOri, PromotorAct.Nombre as NombrePromotorAct from leads LEFT JOIN Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID LEFT JOIN Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID LEFT JOIN Promotor PromotorAct ON leads.PromotorActual = PromotorAct.PromotorID where datediff(curdate(), leads.FechaPromotorActual) >=3 AND FechaPrimerContacto IS NULL and PromotorOriginal IS NOT NULL;
+SELECT leads.LeadID, leads.NombreCompleto, leads.telefono,leads.telefono2, leads.CorreoElectronico, leads.CorreoElectronico2, leads.FechaPrimerContacto,leads.FechaNac, leads.EscuelaProcedencia, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.PSeguimiento, leads.Grado,leads.EstatusInsc,leads.SemestreIngreso, leads.Ciclo, leads.AsetNameForm, leads.IsOrganic, leads.TipoReferido, leads.NombreReferido, leads.DondeObtDato, leads.FechaInscripcion, leads.BecaOfrecida, leads.NumeroLista, leads.FechaPromotorOriginal, leads.FechaPromotorActual, leads.Comentarios, leads.Programa, leads.FechaPromotorOriginal, CarrerasInt.Nombre as CarreraInteres,  Campana.Nombre as NombreCampana, MedioDeContacto.Nombre as MedioContacto, CarreraIns.Nombre as CarreraInscrita, PromotorOri.Nombre as NombrePromotorOri, PromotorAct.Nombre as NombrePromotorAct from leads LEFT JOIN Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID LEFT JOIN Promotor PromotorOri ON leads.promotorOriginal = PromotorOri.PromotorID LEFT JOIN Promotor PromotorAct ON leads.promotorActual = PromotorAct.PromotorID where datediff(curdate(), leads.FechaPromotorActual) >=3 AND FechaPrimerContacto IS NULL and promotorOriginal IS NOT NULL;
 
 	DELIMITER //
 
 -- Insert de las carreras
+
+SELECT
+        leads.LeadID,
+        leads.NombreCompleto,
+        leads.telefono,
+        leads.telefono2,
+        leads.CorreoElectronico,
+        leads.CorreoElectronico2,
+        leads.FechaPrimerContacto,
+        leads.promotorActual,
+        PromotorAct.Nombre as NombrePromotorAct
+      FROM
+        leads
+      LEFT JOIN
+        Promotor PromotorAct ON leads.promotorActual = PromotorAct.PromotorID
+      LEFT JOIN
+        users ON PromotorAct.PromotorID = users.promotorId
+      WHERE
+        users.userName = 'Bryan Murga';
 

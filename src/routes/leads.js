@@ -90,8 +90,7 @@ router.post('/create', async (req, res) => {
     INSERT INTO Leads (NombreCompleto, Telefono, Telefono2, CorreoElectronico, CorreoElectronico2, FechaPrimerContacto, FechaNac,
       EscuelaProcedencia, NombrePais, NombreEstado, NombreCiudad, PSeguimiento, CarreraInteresID, Grado, Programa, EstatusInsc,
       SemestreIngreso, Ciclo, CampanaID, AsetNameForm, IsOrganic, MedioDeContactoID, TipoReferido, NombreReferido, DondeObtDato,
-      FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista, promotorOriginal, FechaPromotorOriginal, promotorActual,
-      FechaPromotorActual, Comentarios) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+      FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista, promotorOriginal, FechaPromotorOriginal, promotorActual, FechaPromotorActual, Comentarios) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   const values = [
     NombreCompleto, Telefono, Telefono2, CorreoElectronico, CorreoElectronico2, FechaPrimerContacto, FechaNac,
@@ -245,7 +244,7 @@ router.get('/historial-reasignacion/:id', async (req, res) => {
     });
   } catch (error) {
     console.error('Error al obtener el historial:', error);
-    res.status(500).json({ error: 'Error en el servidor' }); vi
+    res.status(500).json({ error: 'Error en el servidor' });
   }
 });
 
@@ -254,4 +253,4 @@ router.get('/historial-reasignacion/:id', async (req, res) => {
 
 
 
-module.exports = router;
+module.exports = router;  

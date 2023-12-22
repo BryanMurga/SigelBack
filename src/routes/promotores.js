@@ -48,14 +48,11 @@ router.get('/leads', async (req, res) => {
         leads.CorreoElectronico,
         leads.CorreoElectronico2,
         leads.FechaPrimerContacto,
-        PromotorOri.Nombre as NombrePromotorOri,
         PromotorAct.Nombre as NombrePromotorAct
       FROM
         leads
       LEFT JOIN
-        Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID
-      LEFT JOIN
-        Promotor PromotorAct ON leads.PromotorActual = PromotorAct.PromotorID
+        Promotor PromotorAct ON leads.promotorActual = PromotorAct.PromotorID
       LEFT JOIN
         users ON PromotorAct.PromotorID = users.promotorId
       WHERE
