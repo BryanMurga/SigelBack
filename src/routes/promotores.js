@@ -31,7 +31,6 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
-
 router.get('/leads', async (req, res) => {
   // Obtén el valor de userName de los parámetros de consulta (query parameters)
   const userName = req.query.userName;
@@ -49,44 +48,10 @@ router.get('/leads', async (req, res) => {
         leads.CorreoElectronico,
         leads.CorreoElectronico2,
         leads.FechaPrimerContacto,
-        leads.FechaNac,
-        leads.EscuelaProcedencia,
-        leads.NombrePais,
-        leads.NombreEstado,
-        leads.NombreCiudad,
-        leads.PSeguimiento,
-        leads.Grado,  
-        leads.EstatusInsc,
-        leads.SemestreIngreso,
-        leads.Ciclo,
-        leads.AsetNameForm,
-        leads.IsOrganic,
-        leads.TipoReferido,
-        leads.NombreReferido,
-        leads.DondeObtDato,
-        leads.FechaInscripcion,
-        leads.BecaOfrecida,
-        leads.NumeroLista,
-        leads.FechaPromotorOriginal,
-        leads.FechaPromotorActual,
-        leads.Comentarios,
-        leads.Programa,
-        CarrerasInt.Nombre as CarreraInteres,
-        Campana.Nombre as NombreCampana,
-        MedioDeContacto.Nombre as MedioContacto,
-        CarreraIns.Nombre as CarreraInscrita,
         PromotorOri.Nombre as NombrePromotorOri,
         PromotorAct.Nombre as NombrePromotorAct
       FROM
         leads
-      LEFT JOIN
-        Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID
-      LEFT JOIN
-        Campana ON leads.CampanaID = Campana.CampanaID
-      LEFT JOIN
-        MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID
-      LEFT JOIN
-        Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID
       LEFT JOIN
         Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID
       LEFT JOIN
@@ -115,7 +80,7 @@ router.get('/leads', async (req, res) => {
 router.get('/activos/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const promotoresActivos = await pool.query('SELECT Promotor.PromotorID, Promotor.Nombre FROM Promotor LEFT JOIN leads ON Promotor.PromotorID = leads.PromotorActual AND leads.LeadID = ? WHERE promotor.Estado = 1 and leads.PromotorActual IS NULL;', [id]);
+    const promotoresActivos = await pool.query('SELECT Promotor.PromotorID, Promotor.Nombre FROM Promotor LEFT JOIN leads ON Promotor.PromotorID = leads.promotorActual AND leads.LeadID = ? WHERE promotor.Estado = 1 and leads.promotorActual IS NULL;', [id]);
     if (promotoresActivos.length === 0) {
       return res.status(404).json({ error: 'No se encontraron promotores activos' });
     }
