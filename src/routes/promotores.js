@@ -41,69 +41,36 @@ router.get('/leads', async (req, res) => {
   }
 
   const query = `
-      SELECT
-        leads.LeadID,
-        leads.NombreCompleto,
-        leads.telefono,
-        leads.telefono2,
-        leads.CorreoElectronico,
-        leads.CorreoElectronico2,
-        leads.FechaPrimerContacto,
-        leads.FechaNac,
-        leads.EscuelaProcedencia,
-        leads.NombrePais,
-        leads.NombreEstado,
-        leads.NombreCiudad,
-        leads.PSeguimiento,
-        leads.Grado,  
-        leads.EstatusInsc,
-        leads.SemestreIngreso,
-        leads.Ciclo,
-        leads.AsetNameForm,
-        leads.IsOrganic,
-        leads.TipoReferido,
-        leads.NombreReferido,
-        leads.DondeObtDato,
-        leads.FechaInscripcion,
-        leads.BecaOfrecida,
-        leads.NumeroLista,
-        leads.FechaPromotorOriginal,
-        leads.FechaPromotorActual,
-        leads.Comentarios,
-        leads.Programa,
-        CarrerasInt.Nombre as CarreraInteres,
-        Campana.Nombre as NombreCampana,
-        MedioDeContacto.Nombre as MedioContacto,
-        CarreraIns.Nombre as CarreraInscrita,
-        PromotorOri.Nombre as NombrePromotorOri,
-        PromotorAct.Nombre as NombrePromotorAct
-      FROM
-        leads
-      LEFT JOIN
-        Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID
-      LEFT JOIN
-        Campana ON leads.CampanaID = Campana.CampanaID
-      LEFT JOIN
-        MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID
-      LEFT JOIN
-        Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID
-      LEFT JOIN
-        Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID
-      LEFT JOIN
-        Promotor PromotorAct ON leads.PromotorActual = PromotorAct.PromotorID
-      LEFT JOIN
-        users ON PromotorAct.PromotorID = users.promotorId
-      WHERE
-        users.userName = ?;
+  SELECT
+  leads.LeadID,
+  leads.NombreCompleto,
+  leads.Telefono,
+  leads.Telefono2,
+  leads.CorreoElectronico,
+  leads.CorreoElectronico2,
+  leads.FechaPrimerContacto,
+  PromotorOriginal.Nombre AS PromotorOriginalNombre,
+  PromotorActual.Nombre AS PromotorActualNombre
+FROM
+  leads
+LEFT JOIN
+  Promotor AS PromotorOriginal ON leads.promotorOriginal = PromotorOriginal.PromotorID
+LEFT JOIN
+  Promotor AS PromotorActual ON leads.promotorActual = PromotorActual.PromotorID
+LEFT JOIN
+  users ON PromotorActual.PromotorID = users.promotorId
+WHERE
+  users.userName = 'Bryan Murga';
     `;
 
   const valores = [userName];
   try {
     const leads = await pool.query(query, valores);
-    res.json({ 
-      status: 200, 
-      message: 'Lead listado exitosamente', 
-      leads: leads });
+    res.json({
+      status: 200,
+      message: 'Lead listado exitosamente',
+      leads: leads
+    });
   } catch (error) {
     console.error('Error al obtener los leads:', error);
     res.status(500).json({ error: 'Error en el servidor' });
