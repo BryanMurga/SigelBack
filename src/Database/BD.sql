@@ -44,9 +44,10 @@ CREATE TABLE users(
     userName VARCHAR(30) NOT NULL,
     email VARCHAR(30),
     password VARCHAR(30) NOT NULL,
-    role ENUM('admin','promotor','coordinador')
+    role ENUM('admin','promotor','coordinador'),
+    promotorId int,
+    FOREIGN KEY (promotorId) REFERENCES Promotor(PromotorID)
 );
-
 
 -- Crear la tabla "Leads"
 CREATE TABLE Leads (
@@ -87,17 +88,17 @@ CREATE TABLE Leads (
     CarreraInscripcion INT,
     BecaOfrecida DECIMAL(10, 2),
     NumeroLista INT,
-    PromotorOriginal INT,
+    promotorOriginal INT,
     FechaPromotorOriginal DATE,
-    PromotorActual INT,
+    promotorActual INT,
     FechaPromotorActual DATE,
     Comentarios TEXT,
     Contacto INT,
     FOREIGN KEY (CarreraInteresID) REFERENCES Carreras(CarreraID),
     FOREIGN KEY (CampanaID) REFERENCES Campana(CampanaID),
     FOREIGN KEY (MedioDeContactoID) REFERENCES MedioDeContacto(MedioID),
-    FOREIGN KEY (PromotorOriginal) REFERENCES Promotor(PromotorID),
-    FOREIGN KEY (PromotorActual) REFERENCES Promotor(PromotorID),
+    FOREIGN KEY (promotorOriginal) REFERENCES Promotor(PromotorID),
+    FOREIGN KEY (promotorActual) REFERENCES Promotor(PromotorID),
     FOREIGN KEY (CarreraInscripcion) REFERENCES Carreras(CarreraID)
 );
 
@@ -107,6 +108,7 @@ CREATE TABLE Contacto (
     LeadID int,
     FechaContacto DATE,
     Comentario VARCHAR(255),
+    NombrePromotor VARCHAR(50),
     FOREIGN KEY (LeadID) REFERENCES leads(LeadID)
 );
 
@@ -184,6 +186,7 @@ CREATE TABLE ListaComision (
 );
 
 -- Trigger para saber la cantidad de regisros por mes de los leads
+
 CREATE TABLE leadxmes (
     mes INT,
     anio INT,
@@ -198,285 +201,6 @@ CREATE TABLE leadxmes_promotor (
 );
 
 
--- Inserciones para la tabla "Promotor"
-INSERT INTO Promotor (Nombre, Correo, Passw, Telefono, Estado) VALUES
-('Juan Pérez', 'juan@example.com', 'password123', '555-1234', TRUE),
-('María Gómez', 'maria@example.com', 'securepass', '555-5678', TRUE);
-
--- Inserciones para la tabla "Campana"
-INSERT INTO Campana (TipoCamp, Nombre) VALUES
-('Campaña 1', 'Verano 2023'),
-('Campaña 2', 'Otoño 2023');
-
--- Inserciones para la tabla "MedioDeContacto"
-INSERT INTO MedioDeContacto (Nombre) VALUES
-('Teléfono'), ('Correo Electrónico'), ('Redes Sociales');
-
-
-
--- Inserciones para la tabla "ContactoAlumno"
-INSERT INTO ContactoAlumno (FechaContacto, Comentario) VALUES
-('2023-04-10', 'Entrevista realizada con el alumno 1'),
-('2023-04-20', 'Reunión con los padres del alumno 2');
-
--- Inserciones para la tabla "Carreras"
-INSERT INTO Carreras (Nombre) VALUES
-('Licenciatura en Informática'), ('Maestría en Administración');
-
--- Inserciones para la tabla "users"
-INSERT INTO users (userName, email, password, role) VALUES
-('adminuser', 'admin@example.com', 'adminpass', 'admin'),
-('promotoruser', 'promotor@example.com', 'promotorpass', 'promotor');
-
-
--- Inserciones para la tabla "Leads"
-INSERT INTO Leads (NombreCompleto, Telefono, Telefono2, CorreoElectronico, CorreoElectronico2, FechaPrimerContacto, FechaNac,
-EscuelaProcedencia, NombrePais, NombreEstado, NombreCiudad, PSeguimiento, CarreraInteresID, Grado, Programa, EstatusInsc, SemestreIngreso, Ciclo, CampanaID,
-AsetNameForm, IsOrganic, MedioDeContactoID, TipoReferido, NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista,
-PromotorOriginal, FechaPromotorOriginal, PromotorActual, FechaPromotorActual, Comentarios, Contacto) VALUES
-('Carlos Rodríguez', '555-1111', NULL, 'carlos@example.com', NULL, null, '2002-03-10', 'Escuela A', 'México', 'Ciudad de México', 'Benito Juárez',
-  'P-PROSPECTO', 1, 'BACHILLERATO', 'LDI', 'INSC', '1 Semestre', '2023A', 1, 'Formulario1', 'PAUTA', 2, 'PERSONAL UNINTER', 'Juan Pérez', 'B_POSGRADOS',
-  '2023-02-01', 1, 0.00, 101, NULL, NULL, NULL, NULL, NULL, NULL),
-('Ana Gómez', '555-2222', '555-3333', 'ana@example.com', 'ana2@example.com', null, '1998-11-25', 'Escuela B', 'México', 'Estado de México', 'Toluca',
-  'PS-SEGUIMIENTO', 2, 'LIC/ING', 'PEDAGOGÍA', 'REZA', '2 Semestre', '2023A', 2, 'Formulario2', 'ORGÁNICO', 1, 'ESTUDIANTE', 'María Gómez', 'REDES SOCIALES META INSTAGRAM',
-  '2023-03-01', 2, 300.00, 102, 1, '2023-02-15', 2, '2023-03-01', 'Comentario sobre la situación', 2),
-  ('Bryan Murga', '7771301194', '555-3333', 'bryan@example.com', 'bryan2@example.com', null, '1998-11-25', 'Escuela B', 'México', 'Estado de México', 'Toluca',
-  'PS-SEGUIMIENTO', 2, 'LIC/ING', 'SIU', 'REZA', '2 Semestre', '2023A', 2, 'Formulario2', 'ORGÁNICO', 1, 'ESTUDIANTE', 'María Gómez', 'REDES SOCIALES META INSTAGRAM',
-  '2023-03-01', 2, 300.00, 102, 1, '2023-02-15', 2, '2023-03-01', 'Comentario sobre la situación', 2);
-  
--- Inserciones para la tabla "Contacto"
-INSERT INTO Contacto (leadID,FechaContacto, Comentario) VALUES
-(1,'2023-01-01', 'Primer contacto por teléfono'),
-(2,'2023-01-01', 'Primer contacto por teléfono'),
-(2,'2023-02-15', 'Correo enviado para seguimiento');
-
--- Inserciones para la tabla "Alumnos"
-INSERT INTO Alumnos (LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia,
-TipoBaja, RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwiter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional) VALUES
-(1, 'Carlos Rodríguez', '555-1111', 'Escuela A', 1, 'REC2023001', 'LIC2023001', 1, 'Local', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 'INSC', NULL, 'carlos@example.com'),
-(2, 'Ana Gómez', '555-2222', 'Escuela B', 2, 'REC2023002', 'MAES2023002', 2, 'Foraneo', 'Definitiva', NULL, 'ana2@example.com', NULL, NULL, NULL, 5558888, NULL, 2, 'BAJA', '2023-05-20', 'ana@example.com');
-
--- Inserciones para la tabla "ListaComision"
-INSERT INTO ListaComision (PromotorID, FechaInscripcionAlumno, AlumnoID, Status, CicloEscolar, ProgramaID, SemestreIngreso, Matricula, NoRecibo,
-PorcentajeBeca, TotalComision, EscuelaProcedencia, Escuela, Pais, Estado, Municipio, MedioDeContactoID, CanalDeVenta, EsReferido,
-PromocionInscripcion, NumTelefonicoAlumno, CorreoElectronicoProspecto, FechaNacimientoProspecto) VALUES
-(1, '2023-05-01', 1, 'INSC', '2023A', 1, 'Licenciatura', 'LIC2023001', 'REC2023001', '10%', 500.00, 'Escuela X', 'PRIVADA', 'México', 'Ciudad de México', 'Benito Juárez',
-  1, 'WHATSAPP', 'PERSONAL UNINTER', 'FLASH PASS', '555-9999', 'alumno1@example.com', '2000-01-15'),
-(2, '2023-05-05', 2, 'INSO', '2023A', 2, 'Maestría', 'MAES2023002', 'REC2023002', '15%', 700.00, 'Escuela Y', 'PÚBLICA', 'México', 'Estado de México', 'Toluca',
-  2, 'CORREO', 'ESTUDIANTE', 'EGRESADO', '555-8888', 'alumno2@example.com', '1998-08-20');
-
-
-
-DELIMITER //
-CREATE TRIGGER actualizar_conteo
-AFTER INSERT ON leads
-FOR EACH ROW
-BEGIN
-    DECLARE mes_insert INT;
-    DECLARE anio_insert INT;
-    SET mes_insert = MONTH(NEW.FechaPrimerContacto); -- Suponiendo que tienes una columna llamada "fecha" en tu tabla
-    SET anio_insert = YEAR(NEW.FechaPrimerContacto);
-
-    -- Verificar si ya existe un registro para el mes y año actual
-    IF EXISTS (SELECT * FROM leadxmes WHERE mes = mes_insert AND anio = anio_insert) THEN
-        -- Actualizar el conteo
-        UPDATE leadxmes
-        SET cantidad_registros = cantidad_registros + 1
-        WHERE mes = mes_insert AND anio = anio_insert;
-    ELSE
-        -- Insertar un nuevo registro para el mes y año actual
-        INSERT INTO leadxmes (mes, anio, cantidad_registros)
-        VALUES (mes_insert, anio_insert, 1);
-    END IF;
-END;
-//
-DELIMITER ;
-
-DELIMITER //
-CREATE TRIGGER actualizar_conteo_leadxpromotor
-AFTER INSERT ON leads
-FOR EACH ROW
-BEGIN
-    DECLARE mes_insert INT;
-    DECLARE anio_insert INT;
-    DECLARE promotor_insert VARCHAR(255);
-    SET mes_insert = MONTH(NEW.FechaPrimerContacto); -- Suponiendo que tienes una columna llamada "fecha" en tu tabla
-    SET anio_insert = YEAR(NEW.FechaPrimerContacto);
-    SET promotor_insert = NEW.PromotorActual;
-
-    -- Verificar si ya existe un registro para el mes y año actual
-    IF EXISTS (SELECT * FROM leadxmes_promotor WHERE mes = mes_insert AND anio = anio_insert AND promotorActual =  promotor_insert ) THEN
-        -- Actualizar el conteo
-        UPDATE leadxmes_promotor
-        SET cantidad_registros = cantidad_registros + 1
-        WHERE mes = mes_insert AND anio = anio_insert AND nombrePromotor = promotor_insert;
-    ELSE
-        -- Insertar un nuevo registro para el mes y año actual
-        INSERT INTO leadxmes_promotor (mes, anio, nombrePromotor, cantidad_registros)
-        VALUES (mes_insert, anio_insert, promotor_insert, 1);
-    END IF;
-END;
-//
-DELIMITER ;
-
-SET SQL_SAFE_UPDATES = 0;
-
-DELIMITER //
-CREATE TRIGGER insert_alumnos
-AFTER UPDATE ON Leads
-FOR EACH ROW
-BEGIN
-    IF NEW.EstatusInsc = 'INSC' THEN
-        -- Verificar si ya existe un registro para el Lead en la tabla Alumnos
-        IF NOT EXISTS (SELECT * FROM Alumnos WHERE LeadID = NEW.LeadID) THEN
-            -- Insertar un nuevo registro en la tabla Alumnos
-            INSERT INTO Alumnos (LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, Estatus, CarreraInscripcion )
-            VALUES (NEW.LeadID, NEW.NombreCompleto, NEW.Telefono, NEW.EscuelaProcedencia, NEW.PromotorActual, NEW.EstatusInsc, NEW.CarreraInscripcion);
-        ELSE
-            -- Actualizar el registro existente en la tabla Alumnos
-            UPDATE Alumnos
-            SET Nombre = NEW.NombreCompleto,
-                Telefono = NEW.Telefono,
-                EscuelaProcedencia = NEW.EscuelaProcedencia,
-                PromotorID = NEW.PromotorActual,
-                Estatus = NEW.EstatusInsc,
-                CarreraInscripcion = NEW.CarreraInscripcion
-            WHERE LeadID = NEW.LeadID;
-        END IF;
-    END IF;
-END;
-//
-DELIMITER ;
-
- -- DROP trigger insert_alumnos;
-
-UPDATE leads SET EstatusInsc = 'INSC' WHERE LeadID= 3;
-
-//
-DELIMITER ;
-
-DELIMITER //
-CREATE TRIGGER insert_users
-AFTER INSERT ON promotor
-FOR EACH ROW
-BEGIN
-     INSERT INTO users (userName, email, password, role)
-    VALUES (NEW.Nombre, NEW.Correo , NEW.Passw, 'promotor')
-    ON DUPLICATE KEY UPDATE userName = NEW.Nombre, email = NEW.Correo, password = NEW.Passw;
-END;
-//
-DELIMITER ;
-
-DELIMITER //
-CREATE TRIGGER historyPromotor
-AFTER UPDATE ON Leads
-FOR EACH ROW
-BEGIN
-    DECLARE idPromotor INT;
-    DECLARE PromotorNombre VARCHAR(255);
-    DECLARE idPromotorActual INT;
-    DECLARE PromotorNombreActual VARCHAR(255);
-
-    -- Verificar si PromotorOriginal cambió
-    IF NEW.PromotorOriginal is not null and OLD.PromotorOriginal is null THEN
-        -- Obtener el valor actual de PromotorOriginal
-        SET idPromotor = NEW.PromotorOriginal;
-
-        -- Obtener el nombre del promotor
-        SELECT Nombre INTO PromotorNombre FROM promotor WHERE PromotorID = idPromotor;
-
-        -- Insertar en la tabla de reasignaciones
-        INSERT INTO Reasignaciones (LeadID, NombrePromotor, FechaReasignacion)
-        VALUES (OLD.LeadID, PromotorNombre, CURRENT_TIMESTAMP());
-    END IF;
-    
-    IF NEW.PromotorActual <> OLD.PromotorActual THEN
-        -- Obtener el valor actual de PromotorOriginal
-        SET idPromotorActual = NEW.PromotorActual;
-
-        -- Obtener el nombre del promotor
-        SELECT Nombre INTO PromotorNombreActual FROM promotor WHERE PromotorID = idPromotorActual;
-
-        -- Insertar en la tabla de reasignaciones
-        INSERT INTO Reasignaciones (LeadID, NombrePromotor, FechaReasignacion)
-        VALUES (OLD.LeadID, PromotorNombreActual, CURRENT_TIMESTAMP());
-    END IF;
-END;
-//
-DELIMITER ;
-
-
-
--- Select de los leads
-SELECT leads.NombreCompleto, leads.telefono,leads.telefono2, leads.CorreoElectronico, leads.CorreoElectronico2, leads.FechaPrimerContacto,
-leads.FechaNac, leads.EscuelaProcedencia, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.PSeguimiento, leads.Grado,
-leads.EstatusInsc,leads.SemestreIngreso, leads.Ciclo, leads.AsetNameForm, leads.IsOrganic, leads.TipoReferido, leads.NombreReferido, leads.DondeObtDato, 
-leads.FechaInscripcion, leads.BecaOfrecida, leads.NumeroLista, leads.FechaPromotorOriginal, leads.FechaPromotorActual, leads.Comentarios, 
-CarrerasInt.Nombre as CarreraInteres,  Campana.Nombre as NombreCampana, MedioDeContacto.Nombre as MedioContacto, CarreraIns.Nombre as CarreraInscrita, PromotorOri.Nombre as NombrePromotorOri, PromotorAct.Nombre as NombrePromotorAct 
-from leads
-LEFT JOIN Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID
-LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID
-LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID
-LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID
-LEFT JOIN Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID
-LEFT JOIN Promotor PromotorAct ON leads.PromotorActual = PromotorAct.PromotorID;
-
-select leads.NombreCompleto, contacto.FechaContacto, contacto.Comentario from Contacto left join leads on Contacto.LeadID = leads.LeadID where Contacto.LeadID = 2;
-
-select * from reasignaciones;
-use apis4;
-SELECT Promotor.PromotorID, Promotor.Nombre FROM Promotor LEFT JOIN leads ON Promotor.PromotorID = leads.PromotorActual AND leads.LeadID = 3 WHERE promotor.Estado = 1 and leads.PromotorActual IS NULL;
-
-select * from promotor where estado = 1;
-
-select NombrePromotor, FechaReasignacion from Reasignaciones where LeadID = 1;
-
-SELECT leads.LeadID, leads.NombreCompleto, leads.telefono,leads.telefono2, leads.CorreoElectronico, leads.CorreoElectronico2, leads.FechaPrimerContacto,leads.FechaNac, leads.EscuelaProcedencia, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.PSeguimiento, leads.Grado,leads.EstatusInsc,leads.SemestreIngreso, leads.Ciclo, leads.AsetNameForm, leads.IsOrganic, leads.TipoReferido, leads.NombreReferido, leads.DondeObtDato, leads.FechaInscripcion, leads.BecaOfrecida, leads.NumeroLista, leads.FechaPromotorOriginal, leads.FechaPromotorActual, leads.Comentarios, leads.Programa, leads.FechaPromotorOriginal, CarrerasInt.Nombre as CarreraInteres,  Campana.Nombre as NombreCampana, MedioDeContacto.Nombre as MedioContacto, CarreraIns.Nombre as CarreraInscrita, PromotorOri.Nombre as NombrePromotorOri, PromotorAct.Nombre as NombrePromotorAct from leads LEFT JOIN Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID LEFT JOIN Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID LEFT JOIN Promotor PromotorAct ON leads.PromotorActual = PromotorAct.PromotorID where datediff(curdate(), leads.FechaPromotorActual) >=3 AND FechaPrimerContacto IS NULL and PromotorOriginal IS NOT NULL;
-
-	DELIMITER //
-
-CREATE PROCEDURE UpdateVariosRegistros (
-    IN leads_json JSON
-)
-BEGIN
-    DECLARE id_val INT;
-    DECLARE nuevo_valor_json JSON;
-    DECLARE done INT DEFAULT FALSE;
-    DECLARE cur CURSOR FOR SELECT id, nuevo_valor FROM json_table(leads_json, '$[*]' COLUMNS(id INT PATH '$.id', nuevo_valor JSON PATH '$.nuevosValores'));
-    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
-
-    OPEN cur;
-    read_loop: LOOP
-        FETCH cur INTO id_val, nuevo_valor_json;
-        IF done THEN
-            LEAVE read_loop;
-        END IF;
-
-        UPDATE leads
-        SET 
-			EscuelaProcedencia = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.EscuelaProcedencia')), EscuelaProcedencia),
-			NombrePais = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.NombrePais')), NombrePais),
-			NombreEstado = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.NombreEstado')), NombreEstado),
-			NombreCiudad = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.NombreCiudad')), NombreCiudad),
-			PSeguimiento = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.PSeguimiento')), PSeguimiento),
-			CarreraInteresID = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.CarreraInteresID')), CarreraInteresID),
-			Grado = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.Grado')), Grado),
-			Programa = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.Programa')), Programa),
-			EstatusInsc = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.EstatusInsc')), EstatusInsc),
-			SemestreIngreso = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.SemestreIngreso')), SemestreIngreso),
-			Ciclo = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.Ciclo')), Ciclo),
-			CampanaID = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.CampanaID')), CampanaID),
-			AsetNameForm = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.AsetNameForm')), AsetNameForm),
-			IsOrganic = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.IsOrganic')), IsOrganic),
-			MedioDeContactoID = COALESCE(JSON_UNQUOTE(JSON_EXTRACT(nuevo_valor_json, '$.MedioDeContactoID')), MedioDeContactoID)
-        WHERE id = id_val;
-    END LOOP;
-    CLOSE cur;
-END //
-
-DELIMITER ;
-
--- Insert de las carreras
 
 INSERT INTO carreras (CarreraID, Nombre)
 VALUES
@@ -518,3 +242,275 @@ VALUES
     (36, 'Mercadotecnia y Publicidad (LEMKP)'),
     (37, 'Comercio Exterior (LECE)');
 SELECT * FROM apis4.carreras;
+
+
+-- Inserciones para la tabla "Promotor"
+INSERT INTO Promotor (Nombre, Correo, Passw, Telefono, Estado) VALUES
+('Juan Pérez', 'juan@example.com', 'password123', '555-1234', TRUE),
+('María Gómez', 'maria@example.com', 'securepass', '555-5678', TRUE);
+
+-- Inserciones para la tabla "Campana"
+INSERT INTO Campana (TipoCamp, Nombre) VALUES
+('Campaña 1', 'Verano 2023'),
+('Campaña 2', 'Otoño 2023');
+
+-- Inserciones para la tabla "MedioDeContacto"
+INSERT INTO MedioDeContacto (Nombre) VALUES
+('Teléfono'), ('Correo Electrónico'), ('Redes Sociales');
+
+
+
+-- Inserciones para la tabla "ContactoAlumno"
+INSERT INTO ContactoAlumno (FechaContacto, Comentario) VALUES
+('2023-04-10', 'Entrevista realizada con el alumno 1'),
+('2023-04-20', 'Reunión con los padres del alumno 2');
+
+-- Inserciones para la tabla "Carreras"
+INSERT INTO Carreras (Nombre) VALUES
+('Licenciatura en Informática'), ('Maestría en Administración');
+
+-- Inserciones para la tabla "users"
+INSERT INTO users (userName, email, password, role) VALUES
+('adminuser', 'admin@example.com', 'adminpass', 'admin'),
+('promotoruser', 'promotor@example.com', 'promotorpass', 'promotor');
+
+
+-- Inserciones para la tabla "Leads"
+INSERT INTO Leads (NombreCompleto, Telefono, Telefono2, CorreoElectronico, CorreoElectronico2, FechaPrimerContacto, FechaNac,
+EscuelaProcedencia, NombrePais, NombreEstado, NombreCiudad, PSeguimiento, CarreraInteresID, Grado, Programa, EstatusInsc, SemestreIngreso, Ciclo, CampanaID,
+AsetNameForm, IsOrganic, MedioDeContactoID, TipoReferido, NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista,
+promotorOriginal, FechaPromotorOriginal, promotorActual, FechaPromotorActual, Comentarios, Contacto) VALUES
+('Carlos Rodríguez', '555-1111', NULL, 'carlos@example.com', NULL, null, '2002-03-10', 'Escuela A', 'México', 'Ciudad de México', 'Benito Juárez',
+  'P-PROSPECTO', 1, 'BACHILLERATO', 'LDI', 'INSC', '1 Semestre', '2023A', 1, 'Formulario1', 'PAUTA', 2, 'PERSONAL UNINTER', 'Juan Pérez', 'B_POSGRADOS',
+  '2023-02-01', 1, 0.00, 101, NULL, NULL, NULL, NULL, NULL, NULL),
+('Ana Gómez', '555-2222', '555-3333', 'ana@example.com', 'ana2@example.com', null, '1998-11-25', 'Escuela B', 'México', 'Estado de México', 'Toluca',
+  'PS-SEGUIMIENTO', 2, 'LIC/ING', 'PEDAGOGÍA', 'REZA', '2 Semestre', '2023A', 2, 'Formulario2', 'ORGÁNICO', 1, 'ESTUDIANTE', 'María Gómez', 'REDES SOCIALES META INSTAGRAM',
+  '2023-03-01', 2, 300.00, 102, 1, '2023-02-15', 2, '2023-03-01', 'Comentario sobre la situación', 2),
+  ('Bryan Murga', '7771301194', '555-3333', 'bryan@example.com', 'bryan2@example.com', null, '1998-11-25', 'Escuela B', 'México', 'Estado de México', 'Toluca',
+  'PS-SEGUIMIENTO', 2, 'LIC/ING', 'SIU', 'REZA', '2 Semestre', '2023A', 2, 'Formulario2', 'ORGÁNICO', 1, 'ESTUDIANTE', 'María Gómez', 'REDES SOCIALES META INSTAGRAM',
+  '2023-03-01', 2, 300.00, 102, 1, '2023-02-15', 2, '2023-03-01', 'Comentario sobre la situación', 2);
+  
+  INSERT INTO Leads (NombreCompleto, Telefono, Telefono2, CorreoElectronico, CorreoElectronico2, FechaPrimerContacto, FechaNac,
+EscuelaProcedencia, NombrePais, NombreEstado, NombreCiudad, PSeguimiento, CarreraInteresID, Grado, Programa, EstatusInsc, SemestreIngreso, Ciclo, CampanaID,
+AsetNameForm, IsOrganic, MedioDeContactoID, TipoReferido, NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista,
+promotorOriginal, FechaPromotorOriginal, promotorActual, FechaPromotorActual, Comentarios, Contacto) VALUES
+  ('Milton Murga', '7771301194', '555-3333', 'bryan@example.com', 'bryan2@example.com', null, '1998-11-25', 'Escuela B', 'México', 'Estado de México', 'Toluca',
+  'PS-SEGUIMIENTO', 2, 'LIC/ING', 'SIU', 'REZA', '2 Semestre', '2023A', 2, 'Formulario2', 'ORGÁNICO', 1, 'ESTUDIANTE', 'María Gómez', 'REDES SOCIALES META INSTAGRAM',
+  '2023-03-01', 2, 300.00, 102, 3, '2023-02-15', 3, '2023-03-01', 'Comentario sobre la situación', 2);
+  
+-- Inserciones para la tabla "Contacto"
+INSERT INTO Contacto (leadID,FechaContacto, Comentario) VALUES
+(1,'2023-01-01', 'Primer contacto por teléfono'),
+(2,'2023-01-01', 'Primer contacto por teléfono'),
+(2,'2023-02-15', 'Correo enviado para seguimiento');
+
+-- Inserciones para la tabla "Alumnos"
+INSERT INTO Alumnos (LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia,
+TipoBaja, RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwiter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional) VALUES
+(1, 'Carlos Rodríguez', '555-1111', 'Escuela A', 1, 'REC2023001', 'LIC2023001', 1, 'Local', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 'INSC', NULL, 'carlos@example.com'),
+(2, 'Ana Gómez', '555-2222', 'Escuela B', 2, 'REC2023002', 'MAES2023002', 2, 'Foraneo', 'Definitiva', NULL, 'ana2@example.com', NULL, NULL, NULL, 5558888, NULL, 2, 'BAJA', '2023-05-20', 'ana@example.com');
+
+-- Inserciones para la tabla "ListaComision"
+INSERT INTO ListaComision (PromotorID, FechaInscripcionAlumno, AlumnoID, Status, CicloEscolar, ProgramaID, SemestreIngreso, Matricula, NoRecibo,
+PorcentajeBeca, TotalComision, EscuelaProcedencia, Escuela, Pais, Estado, Municipio, MedioDeContactoID, CanalDeVenta, EsReferido,
+PromocionInscripcion, NumTelefonicoAlumno, CorreoElectronicoProspecto, FechaNacimientoProspecto) VALUES
+(1, '2023-05-01', 1, 'INSC', '2023A', 1, 'Licenciatura', 'LIC2023001', 'REC2023001', '10%', 500.00, 'Escuela X', 'PRIVADA', 'México', 'Ciudad de México', 'Benito Juárez',
+  1, 'WHATSAPP', 'PERSONAL UNINTER', 'FLASH PASS', '555-9999', 'alumno1@example.com', '2000-01-15'),
+(2, '2023-05-05', 2, 'INSO', '2023A', 2, 'Maestría', 'MAES2023002', 'REC2023002', '15%', 700.00, 'Escuela Y', 'PÚBLICA', 'México', 'Estado de México', 'Toluca',
+  2, 'CORREO', 'ESTUDIANTE', 'EGRESADO', '555-8888', 'alumno2@example.com', '1998-08-20');
+
+
+-- EJECUTAR HASTA AQUI LA BASE DE DATOS, POSTERIORMENTE EJECUTAR LOS TRIGGERS UNO POR UNO --- IMPORTANTE
+
+DELIMITER //
+CREATE TRIGGER actualizar_conteo
+AFTER INSERT ON leads
+FOR EACH ROW
+BEGIN
+    DECLARE mes_insert INT;
+    DECLARE anio_insert INT;
+    SET mes_insert = MONTH(NEW.FechaPrimerContacto); -- Suponiendo que tienes una columna llamada "fecha" en tu tabla
+    SET anio_insert = YEAR(NEW.FechaPrimerContacto);
+
+    -- Verificar si ya existe un registro para el mes y año actual
+    IF EXISTS (SELECT * FROM leadxmes WHERE mes = mes_insert AND anio = anio_insert) THEN
+        -- Actualizar el conteo
+        UPDATE leadxmes
+        SET cantidad_registros = cantidad_registros + 1
+        WHERE mes = mes_insert AND anio = anio_insert;
+    ELSE
+        -- Insertar un nuevo registro para el mes y año actual
+        INSERT INTO leadxmes (mes, anio, cantidad_registros)
+        VALUES (mes_insert, anio_insert, 1);
+    END IF;
+END;
+//
+DELIMITER ;
+
+-- Revisar Trigger
+/*
+DELIMITER //
+CREATE TRIGGER actualizar_conteo_leadxpromotor
+AFTER INSERT ON leads
+FOR EACH ROW
+BEGIN
+    DECLARE mes_insert INT;
+    DECLARE anio_insert INT;
+    DECLARE promotor_insert VARCHAR(255);
+    SET mes_insert = MONTH(NEW.FechaPrimerContacto); -- Suponiendo que tienes una columna llamada "fecha" en tu tabla
+    SET anio_insert = YEAR(NEW.FechaPrimerContacto);
+    SET promotor_insert = NEW.promotorActual;
+
+    -- Verificar si ya existe un registro para el mes y año actual
+    IF EXISTS (SELECT * FROM leadxmes_promotor WHERE mes = mes_insert AND anio = anio_insert AND promotorActual =  promotor_insert ) THEN
+        -- Actualizar el conteo
+        UPDATE leadxmes_promotor
+        SET cantidad_registros = cantidad_registros + 1
+        WHERE mes = mes_insert AND anio = anio_insert AND nombrePromotor = promotor_insert;
+    ELSE
+        -- Insertar un nuevo registro para el mes y año actual
+        INSERT INTO leadxmes_promotor (mes, anio, nombrePromotor, cantidad_registros)
+        VALUES (mes_insert, anio_insert, promotor_insert, 1);
+    END IF;
+END;
+//
+DELIMITER ;
+
+drop trigger actualizar_conteo_leadxpromotor;
+*/
+
+SET SQL_SAFE_UPDATES = 0; --  IMPORTANTE Ejecutar intrucion
+
+DELIMITER //
+CREATE TRIGGER insert_alumnos
+AFTER UPDATE ON Leads
+FOR EACH ROW
+BEGIN
+    IF NEW.EstatusInsc = 'INSC' THEN
+        -- Verificar si ya existe un registro para el Lead en la tabla Alumnos
+        IF NOT EXISTS (SELECT * FROM Alumnos WHERE LeadID = NEW.LeadID) THEN
+            -- Insertar un nuevo registro en la tabla Alumnos
+            INSERT INTO Alumnos (LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, Estatus, CarreraInscripcion )
+            VALUES (NEW.LeadID, NEW.NombreCompleto, NEW.Telefono, NEW.EscuelaProcedencia, NEW.promotorActual, NEW.EstatusInsc, NEW.CarreraInscripcion);
+        ELSE
+            -- Actualizar el registro existente en la tabla Alumnos
+            UPDATE Alumnos
+            SET Nombre = NEW.NombreCompleto,
+                Telefono = NEW.Telefono,
+                EscuelaProcedencia = NEW.EscuelaProcedencia,
+                PromotorID = NEW.promotorActual,
+                Estatus = NEW.EstatusInsc,
+                CarreraInscripcion = NEW.CarreraInscripcion
+            WHERE LeadID = NEW.LeadID;
+        END IF;
+    END IF;
+END;
+//
+DELIMITER ;
+
+//
+DELIMITER ;
+
+DELIMITER //
+CREATE TRIGGER insert_users
+AFTER INSERT ON promotor
+FOR EACH ROW
+BEGIN
+     INSERT INTO users (userName, email, password, role, promotorId)
+    VALUES (NEW.Nombre, NEW.Correo , NEW.Passw, 'promotor', New.PromotorID)
+    ON DUPLICATE KEY UPDATE userName = NEW.Nombre, email = NEW.Correo, password = NEW.Passw, promotorId = NEW.PromotorID;
+END;
+//
+DELIMITER ;
+
+
+
+DELIMITER //
+CREATE TRIGGER historyPromotor
+AFTER UPDATE ON Leads
+FOR EACH ROW
+BEGIN
+    DECLARE idPromotor INT;
+    DECLARE PromotorNombre VARCHAR(255);
+    DECLARE idPromotorActual INT;
+    DECLARE PromotorNombreActual VARCHAR(255);
+
+    -- Verificar si PromotorOriginal cambió
+    IF NEW.promotorOriginal is not null and OLD.promotorOriginal is null THEN
+        -- Obtener el valor actual de PromotorOriginal
+        SET idPromotor = NEW.promotorOriginal;
+
+        -- Obtener el nombre del promotor
+        SELECT Nombre INTO PromotorNombre FROM promotor WHERE PromotorID = idPromotor;
+
+        -- Insertar en la tabla de reasignaciones
+        INSERT INTO Reasignaciones (LeadID, NombrePromotor, FechaReasignacion)
+        VALUES (OLD.LeadID, PromotorNombre, CURRENT_TIMESTAMP());
+    END IF;
+    
+    IF NEW.promotorActual <> OLD.promotorActual THEN
+        -- Obtener el valor actual de PromotorOriginal
+        SET idPromotorActual = NEW.promotorActual;
+
+        -- Obtener el nombre del promotor
+        SELECT Nombre INTO PromotorNombreActual FROM promotor WHERE PromotorID = idPromotorActual;
+
+        -- Insertar en la tabla de reasignaciones
+        INSERT INTO Reasignaciones (LeadID, NombrePromotor, FechaReasignacion)
+        VALUES (OLD.LeadID, PromotorNombreActual, CURRENT_TIMESTAMP());
+    END IF;
+END;
+//
+DELIMITER ;
+
+
+
+-- Select de los leads
+SELECT leads.NombreCompleto, leads.telefono,leads.telefono2, leads.CorreoElectronico, leads.CorreoElectronico2, leads.FechaPrimerContacto,
+leads.FechaNac, leads.EscuelaProcedencia, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.PSeguimiento, leads.Grado,
+leads.EstatusInsc,leads.SemestreIngreso, leads.Ciclo, leads.AsetNameForm, leads.IsOrganic, leads.TipoReferido, leads.NombreReferido, leads.DondeObtDato, 
+leads.FechaInscripcion, leads.BecaOfrecida, leads.NumeroLista, leads.FechaPromotorOriginal, leads.FechaPromotorActual, leads.Comentarios, 
+CarrerasInt.Nombre as CarreraInteres,  Campana.Nombre as NombreCampana, MedioDeContacto.Nombre as MedioContacto, CarreraIns.Nombre as CarreraInscrita, PromotorOri.Nombre as NombrePromotorOri, PromotorAct.Nombre as NombrePromotorAct 
+from leads
+LEFT JOIN Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID
+LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID
+LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID
+LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID
+LEFT JOIN Promotor PromotorOri ON leads.promotorOriginal = PromotorOri.PromotorID
+LEFT JOIN Promotor PromotorAct ON leads.promotorActual = PromotorAct.PromotorID;
+
+select leads.NombreCompleto, contacto.FechaContacto, contacto.Comentario from Contacto left join leads on Contacto.LeadID = leads.LeadID where Contacto.LeadID = 2;
+
+select * from reasignaciones;
+use apis4;
+SELECT Promotor.PromotorID, Promotor.Nombre FROM Promotor LEFT JOIN leads ON Promotor.PromotorID = leads.promotorActual AND leads.LeadID = 3 WHERE promotor.Estado = 1 and leads.promotorActual IS NULL;
+
+select * from promotor where estado = 1;
+
+select NombrePromotor, FechaReasignacion from Reasignaciones where LeadID = 1;
+
+SELECT leads.LeadID, leads.NombreCompleto, leads.telefono,leads.telefono2, leads.CorreoElectronico, leads.CorreoElectronico2, leads.FechaPrimerContacto,leads.FechaNac, leads.EscuelaProcedencia, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.PSeguimiento, leads.Grado,leads.EstatusInsc,leads.SemestreIngreso, leads.Ciclo, leads.AsetNameForm, leads.IsOrganic, leads.TipoReferido, leads.NombreReferido, leads.DondeObtDato, leads.FechaInscripcion, leads.BecaOfrecida, leads.NumeroLista, leads.FechaPromotorOriginal, leads.FechaPromotorActual, leads.Comentarios, leads.Programa, leads.FechaPromotorOriginal, CarrerasInt.Nombre as CarreraInteres,  Campana.Nombre as NombreCampana, MedioDeContacto.Nombre as MedioContacto, CarreraIns.Nombre as CarreraInscrita, PromotorOri.Nombre as NombrePromotorOri, PromotorAct.Nombre as NombrePromotorAct from leads LEFT JOIN Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID LEFT JOIN Promotor PromotorOri ON leads.promotorOriginal = PromotorOri.PromotorID LEFT JOIN Promotor PromotorAct ON leads.promotorActual = PromotorAct.PromotorID where datediff(curdate(), leads.FechaPromotorActual) >=3 AND FechaPrimerContacto IS NULL and promotorOriginal IS NOT NULL;
+
+	DELIMITER //
+
+-- Insert de las carreras
+
+SELECT
+        leads.LeadID,
+        leads.NombreCompleto,
+        leads.telefono,
+        leads.telefono2,
+        leads.CorreoElectronico,
+        leads.CorreoElectronico2,
+        leads.FechaPrimerContacto,
+        leads.promotorActual,
+        PromotorAct.Nombre as NombrePromotorAct
+      FROM
+        leads
+      LEFT JOIN
+        Promotor PromotorAct ON leads.promotorActual = PromotorAct.PromotorID
+      LEFT JOIN
+        users ON PromotorAct.PromotorID = users.promotorId
+      WHERE
+        users.userName = 'Bryan Murga';
+
