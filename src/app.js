@@ -42,6 +42,8 @@ app.use('/lista-comision', require('./routes/listaComision.js'));
 app.use('/alumno', require('./routes/alumno.js'));
 app.use('/carrera', require('./routes/carrera.js'));
 app.use('/funciones', require('./routes/funciones.js'));
+app.use('/cargar-archivo', require('./routes/cargarArchivo.js'))
+
 app.use(require('./routes/index.js'));
 
 
