@@ -4,15 +4,46 @@ const pool = require('../db.js');
 
 // Obtener todos los alumnos
 router.get('/', async (req, res) => {
+
+  const userName = req.query.userName;
+
+  if (!userName) {
+    return res.status(400).json({ error: 'Se requiere el parámetro userName en el cuerpo de la solicitud' });
+  }
+
+  const query = `SELECT AlumnoID, LeadID, alumnos.Nombre as NombreAlumno, alumnos.Telefono, EscuelaProcedencia, alumnos.PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja, RSFacebook, RSInstagram, RSTiktok, RsLinkedln, RsTwiter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional, Carreras.Nombre as CarreraInsc, promotor.Nombre as PromotorNombre from alumnos LEFT JOIN Carreras ON CarreraInscripcion = Carreras.CarreraID LEFT JOIN promotor ON alumnos.PromotorID = promotor.PromotorID 
+  LEFT JOIN users ON promotor.PromotorID = users.promotorId WHERE users.userName = ?;`
+
+  const valores = [userName];
+
   try {
-    const alumnos = await pool.query('SELECT * FROM Alumnos');
+    const alumnos = await pool.query(query, valores);
     res.json({
       status: 200,
-      message: 'Se han listado los alumnos correctamente',
-      alumnos: alumnos,
+      message: 'Lead listado exitosamente',
+      alumnos: alumnos
     });
   } catch (error) {
-    console.error('Error al obtener los alumnos:', error);
+    console.error('Error al obtener los leads:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
+router.get('/redes/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const redes = await pool.query('SELECT AlumnoID, RSFacebook, RSInstagram, RSTiktok, RsLinkedln, RsTwiter, RSWhatsapp, RSOtro from alumnos where AlumnoID = ?;', [id]);
+    if (redes.length === 0) {
+      return res.status(404).json({ error: 'Redes no encontradas' });
+    }
+    res.json({
+      status: 200,
+      message: 'Se ha obtenido las redes correctamente',
+      redes: redes[0],
+    });
+  } catch (error) {
+    console.error('Error al obtener el alumno:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
