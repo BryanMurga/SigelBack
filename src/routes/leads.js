@@ -56,7 +56,7 @@ router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const lead = await pool.query('SELECT leads.LeadID, leads.NombreCompleto, leads.telefono,leads.telefono2, leads.CorreoElectronico, leads.CorreoElectronico2, leads.FechaPrimerContacto,leads.FechaNac, leads.EscuelaProcedencia, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.PSeguimiento, leads.CarreraInteresID, leads.CarreraInscripcion, leads.Grado,leads.EstatusInsc,leads.SemestreIngreso, leads.Ciclo, leads.CampanaID, leads.AsetNameForm, leads.IsOrganic, leads.MedioDeContactoID, leads.TipoReferido, leads.NombreReferido, leads.DondeObtDato, leads.FechaInscripcion, leads.BecaOfrecida, leads.NumeroLista, leads.PromotorOriginal, leads.FechaPromotorOriginal, leads.PromotorActual, leads.FechaPromotorActual, leads.Comentarios, leads.Programa, CarrerasInt.Nombre as CarreraInteres,  Campana.Nombre as NombreCampana, MedioDeContacto.Nombre as MedioContacto, CarreraIns.Nombre as CarreraInscrita, PromotorOri.Nombre as NombrePromotorOri, PromotorAct.Nombre as NombrePromotorAct from leads LEFT JOIN Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID LEFT JOIN Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID LEFT JOIN Promotor PromotorAct ON leads.PromotorActual = PromotorAct.PromotorID WHERE LeadID = ?', [id]);
+    const lead = await pool.query('SELECT leads.LeadID, leads.NombreCompleto, leads.Telefono,leads.telefono2, leads.CorreoElectronico, leads.CorreoElectronico2, leads.FechaPrimerContacto,leads.FechaNac, leads.EscuelaProcedencia, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.PSeguimiento, leads.CarreraInteresID, leads.CarreraInscripcion, leads.Grado,leads.EstatusInsc,leads.SemestreIngreso, leads.Ciclo, leads.CampanaID, leads.AsetNameForm, leads.IsOrganic, leads.MedioDeContactoID, leads.TipoReferido, leads.NombreReferido, leads.DondeObtDato, leads.FechaInscripcion, leads.BecaOfrecida, leads.NumeroLista, leads.PromotorOriginal, leads.FechaPromotorOriginal, leads.PromotorActual, leads.FechaPromotorActual, leads.Comentarios, leads.Programa, CarrerasInt.Nombre as CarreraInteres,  Campana.Nombre as NombreCampana, MedioDeContacto.Nombre as MedioContacto, CarreraIns.Nombre as CarreraInscrita, PromotorOri.Nombre as NombrePromotorOri, PromotorAct.Nombre as NombrePromotorAct from leads LEFT JOIN Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID LEFT JOIN Promotor PromotorOri ON leads.PromotorOriginal = PromotorOri.PromotorID LEFT JOIN Promotor PromotorAct ON leads.PromotorActual = PromotorAct.PromotorID WHERE LeadID = ?', [id]);
     if (lead.length === 0) {
       return res.status(404).json({ error: 'Lead no encontrado' });
     }
@@ -164,8 +164,7 @@ router.put('/update/:id', async (req, res) => {
     NombreCompleto, Telefono, Telefono2, CorreoElectronico, CorreoElectronico2, FechaPrimerContacto, FechaNac,
     EscuelaProcedencia, NombrePais, NombreEstado, NombreCiudad, PSeguimiento, CarreraInteresID, Grado, Programa,
     EstatusInsc, SemestreIngreso, Ciclo, CampanaID, AsetNameForm, IsOrganic, MedioDeContactoID, TipoReferido,
-    NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista, promotorOriginal,
-    FechaPromotorOriginal, promotorActual, FechaPromotorActual, Comentarios, Contacto
+    NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista
   } = req.body;
 
   // Validar campos obligatorios
@@ -174,20 +173,23 @@ router.put('/update/:id', async (req, res) => {
   }
 
   const query = `UPDATE Leads SET
-      NombreCompleto = ?, Telefono = ?, Telefono2 = ?, CorreoElectronico = ?, CorreoElectronico2 = ?, FechaPrimerContacto = ?, FechaNac = ?,
-      EscuelaProcedencia = ?, NombrePais = ?, NombreEstado = ?, NombreCiudad = ?, PSeguimiento = ?, CarreraInteresID = ?, Grado = ?, Programa = ?,
-      EstatusInsc = ?, SemestreIngreso = ?, Ciclo = ?, CampanaID = ?, AsetNameForm = ?, IsOrganic = ?, MedioDeContactoID = ?, TipoReferido = ?,
-      NombreReferido = ?, DondeObtDato = ?, FechaInscripcion = ?, CarreraInscripcion = ?, BecaOfrecida = ?, NumeroLista = ?, promotorOriginal = ?,
-      FechaPromotorOriginal = ?, promotorActual = ?, FechaPromotorActual = ?, Comentarios = ?, Contacto = ?
-      WHERE LeadID = ?`;
+  NombreCompleto = COALESCE(?, NombreCompleto), Telefono = COALESCE(?, Telefono), Telefono2 = COALESCE(?, Telefono2),
+  CorreoElectronico = COALESCE(?, CorreoElectronico), CorreoElectronico2 = COALESCE(?, CorreoElectronico2),
+  FechaPrimerContacto = COALESCE(?, FechaPrimerContacto), FechaNac = COALESCE(?, FechaNac), EscuelaProcedencia = COALESCE(?, EscuelaProcedencia),
+  NombrePais = COALESCE(?, NombrePais), NombreEstado = COALESCE(?, NombreEstado), NombreCiudad = COALESCE(?, NombreCiudad),
+  PSeguimiento = COALESCE(?, PSeguimiento), CarreraInteresID = COALESCE(?, CarreraInteresID), Grado = COALESCE(?, Grado),
+  Programa = COALESCE(?, Programa), EstatusInsc = COALESCE(?, EstatusInsc), SemestreIngreso = COALESCE(?, SemestreIngreso),
+  Ciclo = COALESCE(?, Ciclo), CampanaID = COALESCE(?, CampanaID), AsetNameForm = COALESCE(?, AsetNameForm), IsOrganic = COALESCE(?, IsOrganic),
+  MedioDeContactoID = COALESCE(?, MedioDeContactoID), TipoReferido = COALESCE(?, TipoReferido), NombreReferido = COALESCE(?, NombreReferido),
+  DondeObtDato = COALESCE(?, DondeObtDato), FechaInscripcion = COALESCE(?, FechaInscripcion), CarreraInscripcion = COALESCE(?, CarreraInscripcion),
+  BecaOfrecida = COALESCE(?, BecaOfrecida), NumeroLista = COALESCE(?, NumeroLista) WHERE LeadID = ?`;
 
   const values = [
     NombreCompleto, Telefono, Telefono2, CorreoElectronico, CorreoElectronico2, FechaPrimerContacto, FechaNac,
     EscuelaProcedencia, NombrePais, NombreEstado, NombreCiudad, PSeguimiento, CarreraInteresID, Grado, Programa,
     EstatusInsc, SemestreIngreso, Ciclo, CampanaID, AsetNameForm, IsOrganic, MedioDeContactoID, TipoReferido,
-    NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista, promotorOriginal,
-    FechaPromotorOriginal, promotorActual, FechaPromotorActual, Comentarios, Contacto,
-    LeadID
+    NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista,
+    id
   ];
 
   try {
