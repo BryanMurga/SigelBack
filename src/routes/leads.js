@@ -182,13 +182,13 @@ router.put('/update/:id', async (req, res) => {
   Ciclo = COALESCE(?, Ciclo), CampanaID = COALESCE(?, CampanaID), AsetNameForm = COALESCE(?, AsetNameForm), IsOrganic = COALESCE(?, IsOrganic),
   MedioDeContactoID = COALESCE(?, MedioDeContactoID), TipoReferido = COALESCE(?, TipoReferido), NombreReferido = COALESCE(?, NombreReferido),
   DondeObtDato = COALESCE(?, DondeObtDato), FechaInscripcion = COALESCE(?, FechaInscripcion), CarreraInscripcion = COALESCE(?, CarreraInscripcion),
-  BecaOfrecida = COALESCE(?, BecaOfrecida), NumeroLista = COALESCE(?, NumeroLista) WHERE LeadID = ?`;
+  BecaOfrecida = COALESCE(?, BecaOfrecida) WHERE LeadID = ?`;
 
   const values = [
     NombreCompleto, Telefono, Telefono2, CorreoElectronico, CorreoElectronico2, FechaPrimerContacto, FechaNac,
     EscuelaProcedencia, NombrePais, NombreEstado, NombreCiudad, PSeguimiento, CarreraInteresID, Grado, Programa,
     EstatusInsc, SemestreIngreso, Ciclo, CampanaID, AsetNameForm, IsOrganic, MedioDeContactoID, TipoReferido,
-    NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista,
+    NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida,
     id
   ];
 
