@@ -49,19 +49,6 @@ router.get('/leads', async (req, res) => {
         leads.CorreoElectronico2,
         leads.FechaPrimerContacto,
         leads.FechaPromotorActual,
-        leads.PSeguimiento,
-        leads.promotorActual,
-        leads.MedioDeContactoID,
-        leads.CarreraInteresID,
-        leads.CarreraInscripcion,
-        leads.Grado,
-        leads.Programa,
-        leads.CampanaID,
-        leads.IsOrganic,
-        leads.EscuelaProcedencia,
-        leads.NombrePais,
-        leads.NombreEstado,
-        leads.NombreCiudad,
         PromotorAct.Nombre as NombrePromotorAct
       FROM
         leads
@@ -130,7 +117,7 @@ router.get('/count', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const count = await pool.query(`SELECT
+    const result  = await pool.query(`SELECT
           p.Nombre AS NombrePromotor,
           COUNT(CASE WHEN l.EstatusInsc = 'INSC' THEN 1 END) AS Count_insc,
           COUNT(CASE WHEN l.PSeguimiento = 'P-PROSPECTO' THEN 1 END) AS P_Prospecto,
@@ -151,10 +138,16 @@ router.get('/count', async (req, res) => {
           leads l ON p.PromotorID = l.promotorActual AND l.CampanaID = (SELECT CampanaID FROM Campana WHERE TipoCamp = 'TikTok')
       GROUP BY
           p.PromotorID, p.Nombre;`);
+
+      const porcentajes = result.map((row) => ({
+        ...row,
+        Datos_Trabajando: row.Datos_Asignados > 0 ? (row.Datos_Trabajados / row.Datos_Asignados) * 100 : 0,
+      }));
+
     res.json({
       status: 200,
       message: 'Se ha obtenido el conteo de leads correctamente',
-      count: count,
+      count: porcentajes,
     });
   } catch (error) {
     console.error('Error al obtener el conteo de leads:', error);
@@ -167,7 +160,7 @@ router.get('/count/meta', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const count = await pool.query(`SELECT
+    const result = await pool.query(`SELECT
           p.Nombre AS NombrePromotor,
           COUNT(CASE WHEN l.EstatusInsc = 'INSC' THEN 1 END) AS Count_insc,
           COUNT(CASE WHEN l.PSeguimiento = 'P-PROSPECTO' THEN 1 END) AS P_Prospecto,
@@ -188,10 +181,17 @@ router.get('/count/meta', async (req, res) => {
           leads l ON p.PromotorID = l.promotorActual AND l.CampanaID = (SELECT CampanaID FROM Campana WHERE TipoCamp = 'Meta')
       GROUP BY
           p.PromotorID, p.Nombre;`);
+
+      const porcentajes = result.map((row) => ({
+        ...row,
+        Datos_Trabajando: row.Datos_Asignados > 0 ? (row.Datos_Trabajados / row.Datos_Asignados) * 100 : 0,
+      }));
+
     res.json({
       status: 200,
       message: 'Se ha obtenido el conteo de leads correctamente',
-      count: count,
+
+      count: porcentajes,
     });
   } catch (error) {
     console.error('Error al obtener el conteo de leads:', error);
