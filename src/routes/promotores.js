@@ -49,6 +49,19 @@ router.get('/leads', async (req, res) => {
         leads.CorreoElectronico2,
         leads.FechaPrimerContacto,
         leads.FechaPromotorActual,
+        leads.PSeguimiento,
+        leads.promotorActual,
+        leads.MedioDeContactoID,
+        leads.CarreraInteresID,
+        leads.CarreraInscripcion,
+        leads.Grado,
+        leads.Programa,
+        leads.CampanaID,
+        leads.IsOrganic,
+        leads.EscuelaProcedencia,
+        leads.NombrePais,
+        leads.NombreEstado,
+        leads.NombreCiudad,
         PromotorAct.Nombre as NombrePromotorAct
       FROM
         leads
@@ -111,6 +124,7 @@ router.get('/activos/all', async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });;
+
 
 // Obtener count de leads por promotor
 router.get('/count', async (req, res) => {

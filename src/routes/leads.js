@@ -144,7 +144,7 @@ router.put('/update-promotor-actual/:id', async (req, res) => {
   }
 
   const fechaActual = new Date().toISOString().slice(0, 19).replace('T', ' ');
-  const query = `UPDATE Leads SET promotorActual = ?, FechaPromotorActual = ? WHERE LeadID = ?`;
+  const query = `UPDATE Leads SET promotorActual = ?, FechaPromotorActual = ? WHERE LeadID = ?;`
   const values = [promotorActual, fechaActual, id];
 
   try {
@@ -255,4 +255,4 @@ router.get('/historial-reasignacion/:id', async (req, res) => {
 
 
 
-module.exports = router;  
+module.exports = router;
