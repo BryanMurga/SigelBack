@@ -125,9 +125,51 @@ router.get('/activos/all', async (req, res) => {
   }
 });;
 
+//Obtener count de leads por General
+router.get('/count/general', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const result  = await pool.query(`SELECT
+        p.Nombre AS NombrePromotor,
+        COUNT(CASE WHEN l.EstatusInsc = 'INSC' THEN 1 END) AS Count_insc,
+        COUNT(CASE WHEN l.PSeguimiento = 'P-PROSPECTO' THEN 1 END) AS P_Prospecto,
+        COUNT(CASE WHEN l.PSeguimiento = 'PS-SEGUIMIENTO' THEN 1 END) AS PS_Seguimiento,
+        COUNT(CASE WHEN l.PSeguimiento = 'PI-INSCRIPCIÓN' THEN 1 END) AS PI_Inscripcion,
+        COUNT(CASE WHEN l.PSeguimiento = 'NI-NO INTERESA' THEN 1 END) AS NI_NO_Interesa,
+        COUNT(CASE WHEN l.PSeguimiento = 'SC-SIN CONTACTO' THEN 1 END) AS SC_Sin_Contacto,
+        COUNT(CASE WHEN l.PSeguimiento = 'DI-DATO NO VALIDO' THEN 1 END) AS DI_Dato_No_Valido,
+        COUNT(CASE WHEN l.PSeguimiento = 'NC-NO CONTESTA' THEN 1 END) AS NC_NO_Contesta,
+        COUNT(CASE WHEN l.PSeguimiento = 'PU-PERSONAL UNINTER' THEN 1 END) AS PU_Personal_UNINTER,
+        COUNT(CASE WHEN l.PSeguimiento = 'AU-ALUMNO UNINTER' THEN 1 END) AS AU_Alumno_UNINTER,
+        COUNT(CASE WHEN l.PSeguimiento = 'DU-DUPLICADO' THEN 1 END) AS DU_Duplicado,
+        COUNT(l.PSeguimiento) AS Datos_Trabajados,
+        COUNT(l.LeadID) AS Datos_Asignados
+        FROM
+            promotor p
+        LEFT JOIN
+            leads l ON p.PromotorID = l.promotorActual
+        GROUP BY
+            p.PromotorID, p.Nombre;`);
+
+      const porcentajes = result.map((row) => ({
+        ...row,
+        Datos_Trabajando: row.Datos_Asignados > 0 ? ((row.Datos_Trabajados / row.Datos_Asignados) * 100).toFixed(2) : 0,
+      }));
+
+    res.json({
+      status: 200,
+      message: 'Se ha obtenido el conteo de leads correctamente',
+      count: porcentajes,
+    });
+  } catch (error) {
+    console.error('Error al obtener el conteo de leads:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
 
 // Obtener count de leads por promotor
-router.get('/count', async (req, res) => {
+router.get('/count/tiktok', async (req, res) => {
   const { id } = req.params;
 
   try {
@@ -155,7 +197,7 @@ router.get('/count', async (req, res) => {
 
       const porcentajes = result.map((row) => ({
         ...row,
-        Datos_Trabajando: row.Datos_Asignados > 0 ? (row.Datos_Trabajados / row.Datos_Asignados) * 100 : 0,
+        Datos_Trabajando: row.Datos_Asignados > 0 ? ((row.Datos_Trabajados / row.Datos_Asignados) * 100).toFixed(2) : 0,
       }));
 
     res.json({
@@ -198,7 +240,7 @@ router.get('/count/meta', async (req, res) => {
 
       const porcentajes = result.map((row) => ({
         ...row,
-        Datos_Trabajando: row.Datos_Asignados > 0 ? (row.Datos_Trabajados / row.Datos_Asignados) * 100 : 0,
+        Datos_Trabajando: row.Datos_Asignados > 0 ? ((row.Datos_Trabajados / row.Datos_Asignados) * 100).toFixed(2) : 0,
       }));
 
     res.json({
