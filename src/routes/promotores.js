@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
 
     // Verificar si se proporciona un parámetro de búsqueda por nombre
     if (req.query.nombre) {
-      const nombre = `%${req.query.nombre}%`; // Añadir comodines para buscar coincidencias parciales
+      const nombre = `%${req.query.nombre}%;` // Añadir comodines para buscar coincidencias parciales
       query += ' WHERE Nombre LIKE ?';
       const listPromotores = await pool.query(query, [nombre]);
       res.json({
