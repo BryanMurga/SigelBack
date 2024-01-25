@@ -87,6 +87,32 @@ router.get('/leads', async (req, res) => {
   }
 });
 
+router.get('/getPromotorID', async (req, res) => {
+
+  const userName = req.query.userName;
+
+  if (!userName) {
+    return res.status(400).json({ error: 'Se requiere el parámetro userName en el cuerpo de la solicitud' });
+  }
+
+  const query = `select promotorID from users where userName = ?`;
+
+  const valores = [userName];
+  try {
+    const promotor = await pool.query(query, valores);
+    res.json({
+      status: 200,
+      message: 'Promotro ID listado exitosamente',
+      promotor: promotor[0]
+    });
+  } catch (error) {
+    console.error('Error al obtener el promotorID:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+
+});
+
+
 
 // Obtener promotores activos
 router.get('/activos/:id', async (req, res) => {

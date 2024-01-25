@@ -133,6 +133,40 @@ router.put('/update-promotor/:id', async (req, res) => {
   }
 });
 
+// Actualizar el promotor de multiples leads
+router.put('/update-multiple-leads-promotor', async (req, res) => {
+  const updateMultipleLeads = req.body;
+
+  // Validar que el campo PromotorActual esté presente en la solicitud
+  // if (!updateMultipleLeads || !updateMultipleLeads.leadIDs || !updateMultipleLeads.promotorOriginal) {
+  //   return res.status(400).json({ error: 'El campo Promotor Original es obligatorio' });
+  // }
+  const leadIDs = Array.isArray(updateMultipleLeads.leadIDs) ? updateMultipleLeads.leadIDs : [updateMultipleLeads.leadIDs];
+  promotor = updateMultipleLeads.promotorOriginal;
+  const fechaActual = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+  const query = `
+    UPDATE Leads 
+    SET 
+      promotorOriginal = ?, 
+      FechaPromotorOriginal = ?, 
+      promotorActual = ?, 
+      FechaPromotorActual = ? 
+    WHERE 
+      LeadID IN (${leadIDs.map(() => '?').join(',')})
+  `;
+  const values = [promotor , fechaActual,promotor , fechaActual, ...leadIDs];
+
+  try {
+    await pool.query(query, values);
+    res.json({ status: 200, message: 'Promotor actualizado exitosamente para los leads seleccionados' });
+  } catch (error) {
+    console.error('Error al actualizar los leads de el promotor del lead:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
+
 // Actualizar solo el campo Promotor Actual de un lead por su ID
 router.put('/update-promotor-actual/:id', async (req, res) => {
   const { id } = req.params;
@@ -249,6 +283,7 @@ router.get('/historial-reasignacion/:id', async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
+
 
 
 
