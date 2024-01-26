@@ -101,7 +101,7 @@ router.get("/dash-prom", async (req, res) => {
   }
 
   try {
-    const inscripcionesPorPromotor = await pool.query('SELECT p.Nombre AS PromotorNombre, l.promotorActual AS PromotorID, COUNT(*) AS total FROM Leads l JOIN Promotor p ON l.promotorActual = p.PromotorID WHERE p.PromotorID = ? GROUP BY l.promotorActual', [userName]);
+    const inscripcionesPorPromotor = await pool.query('SELECT p.Nombre AS PromotorNombre, l.promotorActual AS PromotorID, l.Grado, COUNT(*) AS total FROM Leads l JOIN Promotor p ON l.promotorActual = p.PromotorID WHERE p.PromotorID = ? GROUP BY l.promotorActual, l.Grado', [userName]);
     const inscripcionesPorEdad = await pool.query('SELECT YEAR(CURDATE()) - YEAR(FechaNac) AS Edad, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY YEAR(CURDATE()) - YEAR(FechaNac)', [userName]);
     const inscripcionesPorStatus = await pool.query('SELECT EstatusInsc, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY EstatusInsc', [userName]);
     const totalPorGrado = await pool.query('SELECT Grado, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY Grado', [userName]);
@@ -114,9 +114,11 @@ router.get("/dash-prom", async (req, res) => {
     const totalPorSemestre = await pool.query('SELECT SemestreIngreso, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY SemestreIngreso', [userName]);
     const totalPorReferido = await pool.query('SELECT TipoReferido, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY TipoReferido', [userName]);
     const totalPorEscuela = await pool.query('SELECT EscuelaProcedencia, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY EscuelaProcedencia', [userName]);
-    const totalInscripcionesPorAnio = await pool.query('SELECT YEAR(FechaInscripcion) AS anio, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY YEAR(FechaInscripcion)', [userName]);
+    const totalInscripcionesPorAnio = await pool.query('SELECT l.promotorActual AS PromotorID, MONTH(l.FechaPrimerContacto) AS mes, YEAR(l.FechaPrimerContacto) AS anio, COUNT(*) AS cantidad_registros FROM Leads l JOIN Promotor p ON l.promotorActual = p.PromotorID WHERE p.PromotorID = ? GROUP BY PromotorID, mes, anio', [userName]);
     const totalInscripcionesPorMes = await pool.query('SELECT YEAR(FechaInscripcion) AS anio, MONTH(FechaInscripcion) AS mes, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY YEAR(FechaInscripcion), MONTH(FechaInscripcion)', [userName]);
     const totalDondeObtDato = await pool.query('SELECT DondeObtDato, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY DondeObtDato', [userName]);
+
+
 
     // Construir un objeto de respuesta con todas las consultas
     const response = {
