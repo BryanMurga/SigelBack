@@ -29,6 +29,25 @@ router.get('/', async (req, res) => {
   }
 });
 
+router.get('/coordinador', async (req, res) => {
+
+  const userName = req.query.userName;
+
+  const query = `SELECT AlumnoID, alumnos.LeadID, alumnos.Nombre as NombreAlumno, alumnos.Telefono, alumnos.EscuelaProcedencia, alumnos.PromotorID, NoRecibo, Matricula, alumnos.CarreraInscripcion, Procedencia, TipoBaja, RSFacebook, RSInstagram, RSTiktok, RsLinkedln, RsTwiter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional, leads.CorreoElectronico, leads.FechaNac, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.Grado, leads.Programa, leads.SemestreIngreso, leads.Ciclo, leads.TipoReferido, leads.NombreReferido, leads.FechaInscripcion, leads.BecaOfrecida, Carreras.Nombre as CarreraInsc, promotor.Nombre as PromotorNombre from alumnos LEFT JOIN leads ON alumnos.LeadID = leads.LeadID  LEFT JOIN Carreras ON alumnos.CarreraInscripcion = Carreras.CarreraID LEFT JOIN promotor ON alumnos.PromotorID = promotor.PromotorID ;`
+
+  try {
+    const alumnos = await pool.query(query);
+    res.json({
+      status: 200,
+      message: 'Lead listado exitosamente',
+      alumnos: alumnos
+    }); 
+  } catch (error) {
+    console.error('Error al obtener los leads:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
 router.get('/redes/:id', async (req, res) => {
   const { id } = req.params;
 
@@ -53,7 +72,7 @@ router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const alumno = await pool.query('SELECT * FROM Alumnos WHERE AlumnoID = ?', [id]);
+    const alumno = await pool.query('SELECT AlumnoID, alumnos.LeadID, alumnos.Nombre as NombreAlumno, alumnos.Telefono, alumnos.EscuelaProcedencia, alumnos.PromotorID, NoRecibo, Matricula, alumnos.CarreraInscripcion, Procedencia, TipoBaja, RSFacebook, RSInstagram, RSTiktok, RsLinkedln, RsTwiter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional, leads.CorreoElectronico, leads.FechaNac, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.Grado, leads.Programa, leads.SemestreIngreso, leads.Ciclo, leads.TipoReferido, leads.NombreReferido, leads.FechaInscripcion, leads.BecaOfrecida, Carreras.Nombre as CarreraInsc, promotor.Nombre as PromotorNombre from alumnos LEFT JOIN leads ON alumnos.LeadID = leads.LeadID  LEFT JOIN Carreras ON alumnos.CarreraInscripcion = Carreras.CarreraID LEFT JOIN promotor ON alumnos.PromotorID = promotor.PromotorID WHERE AlumnoID = ?', [id]);
     if (alumno.length === 0) {
       return res.status(404).json({ error: 'Alumno no encontrado' });
     }
