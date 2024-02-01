@@ -347,42 +347,41 @@ END;
 //
 DELIMITER ;
 
--- Revisar Trigger
-/*
+
+
+SET SQL_SAFE_UPDATES = 0; --  IMPORTANTE Ejecutar intrucion
+
 DELIMITER //
-CREATE TRIGGER actualizar_conteo_leadxpromotor
-AFTER INSERT ON leads
+CREATE TRIGGER insert_alumnos_create
+AFTER INSERT ON Leads
 FOR EACH ROW
 BEGIN
-    DECLARE mes_insert INT;
-    DECLARE anio_insert INT;
-    DECLARE promotor_insert VARCHAR(255);
-    SET mes_insert = MONTH(NEW.FechaPrimerContacto); -- Suponiendo que tienes una columna llamada "fecha" en tu tabla
-    SET anio_insert = YEAR(NEW.FechaPrimerContacto);
-    SET promotor_insert = NEW.promotorActual;
-
-    -- Verificar si ya existe un registro para el mes y año actual
-    IF EXISTS (SELECT * FROM leadxmes_promotor WHERE mes = mes_insert AND anio = anio_insert AND promotorActual =  promotor_insert ) THEN
-        -- Actualizar el conteo
-        UPDATE leadxmes_promotor
-        SET cantidad_registros = cantidad_registros + 1
-        WHERE mes = mes_insert AND anio = anio_insert AND nombrePromotor = promotor_insert;
-    ELSE
-        -- Insertar un nuevo registro para el mes y año actual
-        INSERT INTO leadxmes_promotor (mes, anio, nombrePromotor, cantidad_registros)
-        VALUES (mes_insert, anio_insert, promotor_insert, 1);
+    IF NEW.EstatusInsc = 'INSC' THEN
+        -- Verificar si ya existe un registro para el Lead en la tabla Alumnos
+        IF NOT EXISTS (SELECT * FROM Alumnos WHERE LeadID = NEW.LeadID) THEN
+            -- Insertar un nuevo registro en la tabla Alumnos
+            INSERT INTO Alumnos (LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, Estatus, CarreraInscripcion )
+            VALUES (NEW.LeadID, NEW.NombreCompleto, NEW.Telefono, NEW.EscuelaProcedencia, NEW.promotorActual, NEW.EstatusInsc, NEW.CarreraInscripcion);
+        ELSE
+            -- Actualizar el registro existente en la tabla Alumnos
+            UPDATE Alumnos
+            SET Nombre = NEW.NombreCompleto,
+                Telefono = NEW.Telefono,
+                EscuelaProcedencia = NEW.EscuelaProcedencia,
+                PromotorID = NEW.promotorActual,
+                Estatus = NEW.EstatusInsc,
+                CarreraInscripcion = NEW.CarreraInscripcion
+            WHERE LeadID = NEW.LeadID;
+        END IF;
     END IF;
 END;
 //
 DELIMITER ;
 
-drop trigger actualizar_conteo_leadxpromotor;
-*/
 
-SET SQL_SAFE_UPDATES = 0; --  IMPORTANTE Ejecutar intrucion
 
 DELIMITER //
-CREATE TRIGGER insert_alumnos
+CREATE TRIGGER insert_alumnos_update
 AFTER UPDATE ON Leads
 FOR EACH ROW
 BEGIN
@@ -422,6 +421,24 @@ BEGIN
 END;
 //
 DELIMITER ;
+
+-- update promotor
+DELIMITER //
+
+CREATE TRIGGER update_users
+AFTER UPDATE ON Promotor
+FOR EACH ROW
+BEGIN
+    UPDATE users
+    SET userName = NEW.Nombre,
+        email = NEW.Correo,
+        password = NEW.Passw,
+        role = 'promotor'
+    WHERE promotorId = NEW.PromotorID;
+END;
+//
+DELIMITER ;
+
 
 
 
