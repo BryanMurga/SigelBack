@@ -75,14 +75,14 @@ router.post('/create', async (req, res) => {
     RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwitter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional } = req.body;
 
   // Validar campos obligatorios
-  if (!LeadID || !Nombre) {
-    return res.status(400).json({ error: 'LeadID y Nombre son campos obligatorios' });
-  }
+  // if (!LeadID || !Nombre) {
+  //   return res.status(400).json({ error: 'LeadID y Nombre son campos obligatorios' });
+  // }
 
   // Construir la consulta SQL y los valores
   const query = `INSERT INTO Alumnos
     (LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja,
-    RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwitter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional)
+    RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwiter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   const values = [LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja,
