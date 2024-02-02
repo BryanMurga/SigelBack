@@ -62,6 +62,7 @@ router.get('/leads', async (req, res) => {
         leads.NombrePais,
         leads.NombreEstado,
         leads.NombreCiudad,
+        leads.EstatusInsc,
         PromotorAct.Nombre as NombrePromotorAct
       FROM
         leads
@@ -70,7 +71,7 @@ router.get('/leads', async (req, res) => {
       LEFT JOIN
         users ON PromotorAct.PromotorID = users.promotorId
       WHERE
-        users.userName = ? AND datediff(curdate(), leads.FechaPromotorActual) <=3;
+        users.userName = ? OR datediff(curdate(), leads.FechaPromotorActual) <=3 AND leads.PSeguimiento IS NOT NULL AND leads.EstatusInsc IS NOT NULL;
     `;
 
   const valores = [userName];
