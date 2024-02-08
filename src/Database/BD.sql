@@ -290,14 +290,6 @@ promotorOriginal, FechaPromotorOriginal, promotorActual, FechaPromotorActual, Co
   'PS-SEGUIMIENTO', 2, 'LIC/ING', 'SIU', 'REZA', '2 Semestre', '2023A', 2, 'Formulario2', 'ORGÁNICO', 1, 'ESTUDIANTE', 'María Gómez', 'REDES SOCIALES META INSTAGRAM',
   '2023-03-01', 2, 300.00, 102, 1, '2023-02-15', 2, '2023-03-01', 'Comentario sobre la situación', 2);
   
-  INSERT INTO Leads (NombreCompleto, Telefono, Telefono2, CorreoElectronico, CorreoElectronico2, FechaPrimerContacto, FechaNac,
-EscuelaProcedencia, NombrePais, NombreEstado, NombreCiudad, PSeguimiento, CarreraInteresID, Grado, Programa, EstatusInsc, SemestreIngreso, Ciclo, CampanaID,
-AsetNameForm, IsOrganic, MedioDeContactoID, TipoReferido, NombreReferido, DondeObtDato, FechaInscripcion, CarreraInscripcion, BecaOfrecida, NumeroLista,
-promotorOriginal, FechaPromotorOriginal, promotorActual, FechaPromotorActual, Comentarios, Contacto) VALUES
-  ('Milton Murga', '7771301194', '555-3333', 'bryan@example.com', 'bryan2@example.com', null, '1998-11-25', 'Escuela B', 'México', 'Estado de México', 'Toluca',
-  'PS-SEGUIMIENTO', 2, 'LIC/ING', 'SIU', 'REZA', '2 Semestre', '2023A', 2, 'Formulario2', 'ORGÁNICO', 1, 'ESTUDIANTE', 'María Gómez', 'REDES SOCIALES META INSTAGRAM',
-  '2023-03-01', 2, 300.00, 102, 3, '2023-02-15', 3, '2023-03-01', 'Comentario sobre la situación', 2);
-  
 -- Inserciones para la tabla "Contacto"
 INSERT INTO Contacto (leadID,FechaContacto, Comentario) VALUES
 (1,'2023-01-01', 'Primer contacto por teléfono'),

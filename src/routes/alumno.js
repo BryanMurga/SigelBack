@@ -11,7 +11,7 @@ router.get('/', async (req, res) => {
     return res.status(400).json({ error: 'Se requiere el parámetro userName en el cuerpo de la solicitud' });
   }
 
-  const query = `SELECT AlumnoID, LeadID, alumnos.Nombre as NombreAlumno, alumnos.Telefono, EscuelaProcedencia, alumnos.PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja, RSFacebook, RSInstagram, RSTiktok, RsLinkedln, RsTwiter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional, Carreras.Nombre as CarreraInsc, promotor.Nombre as PromotorNombre from alumnos LEFT JOIN Carreras ON CarreraInscripcion = Carreras.CarreraID LEFT JOIN promotor ON alumnos.PromotorID = promotor.PromotorID 
+  const query = `SELECT AlumnoID, LeadID, alumnos.Nombre as NombreAlumno, alumnos.Telefono, EscuelaProcedencia, alumnos.PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja, RSFacebook, RSInstagram, RSTiktok, RsLinkedln, RsTwiter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional, Carreras.Nombre as CarreraInsc, promotor.Nombre as PromotorNombre from alumnos LEFT JOIN Carreras ON CarreraInscripcion = Carreras.CarreraID LEFT JOIN promotor ON alumnos.PromotorID = promotor.PromotorID
   LEFT JOIN users ON promotor.PromotorID = users.promotorId WHERE users.userName = ?;`
 
   const valores = [userName];
@@ -41,7 +41,7 @@ router.get('/coordinador', async (req, res) => {
       status: 200,
       message: 'Lead listado exitosamente',
       alumnos: alumnos
-    }); 
+    });
   } catch (error) {
     console.error('Error al obtener los leads:', error);
     res.status(500).json({ error: 'Error en el servidor' });
@@ -72,7 +72,11 @@ router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const alumno = await pool.query('SELECT AlumnoID, alumnos.LeadID, alumnos.Nombre as NombreAlumno, alumnos.Telefono, alumnos.EscuelaProcedencia, alumnos.PromotorID, NoRecibo, Matricula, alumnos.CarreraInscripcion, Procedencia, TipoBaja, RSFacebook, RSInstagram, RSTiktok, RsLinkedln, RsTwiter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional, leads.CorreoElectronico, leads.FechaNac, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.Grado, leads.Programa, leads.SemestreIngreso, leads.Ciclo, leads.TipoReferido, leads.NombreReferido, leads.FechaInscripcion, leads.BecaOfrecida, Carreras.Nombre as CarreraInsc, promotor.Nombre as PromotorNombre from alumnos LEFT JOIN leads ON alumnos.LeadID = leads.LeadID  LEFT JOIN Carreras ON alumnos.CarreraInscripcion = Carreras.CarreraID LEFT JOIN promotor ON alumnos.PromotorID = promotor.PromotorID WHERE AlumnoID = ?', [id]);
+    const alumno = await pool.query(`SELECT *, alumnos.Nombre as nombreAlumno, carreras.Nombre as CarreraInscrita, Promotor.Nombre as NombrePromotor
+    FROM Alumnos
+    LEFT JOIN carreras ON Alumnos.CarreraInscripcion = carreras.CarreraID
+    LEFT JOIN promotor ON Alumnos.PromotorID = promotor.PromotorID
+    WHERE Alumnos.AlumnoID = ?;`, [id]);
     if (alumno.length === 0) {
       return res.status(404).json({ error: 'Alumno no encontrado' });
     }
@@ -91,12 +95,12 @@ router.get('/:id', async (req, res) => {
 router.post('/create', async (req, res) => {
   // Desestructurar los campos del cuerpo de la solicitud
   const { LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja,
-    RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwitter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional } = req.body;
+    RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwiter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional } = req.body;
 
   // Validar campos obligatorios
-  // if (!LeadID || !Nombre) {
-  //   return res.status(400).json({ error: 'LeadID y Nombre son campos obligatorios' });
-  // }
+  if (!LeadID || !Nombre) {
+    return res.status(400).json({ error: 'LeadID y Nombre son campos obligatorios' });
+  }
 
   // Construir la consulta SQL y los valores
   const query = `INSERT INTO Alumnos
@@ -105,7 +109,7 @@ router.post('/create', async (req, res) => {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
   const values = [LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja,
-    RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwitter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional];
+    RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwiter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional];
 
   try {
     // Ejecutar la consulta y obtener el resultado
@@ -126,28 +130,44 @@ router.put('/update/:id', async (req, res) => {
   const { id } = req.params;
 
   // Desestructurar los campos del cuerpo de la solicitud
-  const { LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja,
-    RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwitter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional } = req.body;
+  const { Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja,
+    RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwiter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional } = req.body;
 
   // Validar campos obligatorios
-  if (!LeadID || !Nombre) {
+  if (!Nombre) {
     return res.status(400).json({ error: 'LeadID y Nombre son campos obligatorios' });
   }
 
   // Construir la consulta SQL y los valores
-  const query = `UPDATE Alumnos SET
-    LeadID = ?, Nombre = ?, Telefono = ?, EscuelaProcedencia = ?, PromotorID = ?, NoRecibo = ?, Matricula = ?, CarreraInscripcion = ?,
-    Procedencia = ?, TipoBaja = ?, RSFacebook = ?, RSInstagram = ?, RSTiktok = ?, RSLinkedln = ?, RSTwitter = ?, RSWhatsapp = ?, RSOtro = ?,
-    ContactoID = ?, Estatus = ?, FechaBaja = ?, CorreoInstitucional = ?
-    WHERE AlumnoID = ?`;
+  const query = `UPDATE alumnos SET
+  Nombre = COALESCE(?, Nombre),
+  Telefono = COALESCE(?, Telefono),
+  EscuelaProcedencia = COALESCE(?, EscuelaProcedencia),
+  PromotorID = COALESCE(?, PromotorID),
+  NoRecibo = COALESCE(?, NoRecibo),
+  Matricula = COALESCE(?, Matricula),
+  CarreraInscripcion = COALESCE(?, CarreraInscripcion),
+  Procedencia = COALESCE(?, Procedencia),
+  TipoBaja = COALESCE(?, TipoBaja),
+  RSFacebook = COALESCE(?, RSFacebook),
+  RSInstagram = COALESCE(?, RSInstagram),
+  RSTiktok = COALESCE(?, RSTiktok),
+  RSLinkedln = COALESCE(?, RSLinkedln),
+  RSTwiter = COALESCE(?, RSTwiter),
+  RSWhatsapp = COALESCE(?, RSWhatsapp),
+  RSOtro = COALESCE(?, RSOtro),
+  ContactoID = COALESCE(?, ContactoID),
+  Estatus = COALESCE(?, Estatus),
+  FechaBaja = COALESCE(?, FechaBaja),
+  CorreoInstitucional = COALESCE(?, CorreoInstitucional)
+WHERE AlumnoID = ?;`;
 
-  const values = [LeadID, Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja,
-    RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwitter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional, id];
+  const values = [ Nombre, Telefono, EscuelaProcedencia, PromotorID, NoRecibo, Matricula, CarreraInscripcion, Procedencia, TipoBaja,
+    RSFacebook, RSInstagram, RSTiktok, RSLinkedln, RSTwiter, RSWhatsapp, RSOtro, ContactoID, Estatus, FechaBaja, CorreoInstitucional, id];
 
   try {
     // Ejecutar la consulta
     await pool.query(query, values);
-
     // Enviar una respuesta JSON
     res.json({ status: 200, message: 'Alumno actualizado exitosamente' });
   } catch (error) {
