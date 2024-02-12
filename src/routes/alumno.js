@@ -177,6 +177,38 @@ WHERE AlumnoID = ?;`;
   }
 });
 
+//Dar de baja alumno
+router.put('/baja/:id', async (req, res) => {
+  // Obtener el ID del alumno desde los parámetros de la solicitud
+  const { id } = req.params;
+
+  // Desestructurar los campos del cuerpo de la solicitud
+  const { TipoBaja} = req.body;
+
+  // Validar campos obligatorios
+  if (!TipoBaja) {
+    return res.status(400).json({ error: 'TipoBaja, Estatus y FechaBaja son campos obligatorios' });
+  }
+
+  // Construir la consulta SQL y los valores
+  const query = `UPDATE alumnos SET
+  TipoBaja = ?, Estatus = 'BAJA', FechaBaja = CURRENT_DATE
+  WHERE AlumnoID = ?;`;
+
+  const values = [TipoBaja, id];
+
+  try {
+    // Ejecutar la consulta
+    await pool.query(query, values);
+    // Enviar una respuesta JSON
+    res.json({ status: 200, message: 'Alumno se ha dado de baja exitosamente' });
+  } catch (error) {
+    // Manejar errores y enviar una respuesta de error
+    console.error('Error al dar de baja el alumno:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
 // Eliminar un alumno por su ID
 router.delete('/delete/:id', async (req, res) => {
   // Obtener el ID del alumno desde los parámetros de la solicitud
