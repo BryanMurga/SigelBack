@@ -55,6 +55,10 @@ router.get("/datos-graficas", async (req, res) => {
     const totalDondeObtDato = await pool.query(
       "SELECT DondeObtDato, COUNT(*) AS total FROM Leads GROUP BY DondeObtDato"
     );
+    const totalPSeguimiento = await pool.query(
+      "SELECT PSeguimiento, COUNT(*) AS total FROM Leads GROUP BY PSeguimiento"
+    );
+
     // Construir un objeto de respuesta con todas las consultas
     const response = {
       inscripcionesPorPromotor,
@@ -73,6 +77,7 @@ router.get("/datos-graficas", async (req, res) => {
       totalInscripcionesPorAnio,
       totalInscripcionesPorMes,
       totalDondeObtDato,
+      totalPSeguimiento,
     };
 
     res.json({
@@ -86,68 +91,113 @@ router.get("/datos-graficas", async (req, res) => {
   }
 });
 
-// Obtener datos del dashboard para el promotor
-// Importa los módulos necesarios
-
-// Endpoint para inscripcionesPorEdad por promotor
-// Suponiendo que estás utilizando Express.js y que pool es tu conexión a la base de datos
-
-// Obtener datos para las gráficas
+// Obtener datos para las gráficas promotor
 router.get("/dash-prom", async (req, res) => {
   const userName = req.query.userName;
 
   if (!userName) {
-    return res.status(400).json({ error: 'Se requiere el parámetro userName en el cuerpo de la solicitud' });
+    return res
+      .status(400)
+      .json({
+        error: "Se requiere el parámetro userName en el cuerpo de la solicitud",
+      });
   }
 
   try {
-    const inscripcionesPorPromotor = await pool.query('SELECT p.Nombre AS PromotorNombre, l.promotorActual AS PromotorID, l.Grado, COUNT(*) AS total FROM Leads l JOIN Promotor p ON l.promotorActual = p.PromotorID WHERE p.PromotorID = ? GROUP BY l.promotorActual, l.Grado', [userName]);
-    const inscripcionesPorEdad = await pool.query('SELECT YEAR(CURDATE()) - YEAR(FechaNac) AS Edad, COUNT(*) AS total FROM  Leads  WHERE u.userName = ? GROUP BY YEAR(CURDATE()) - YEAR(FechaNac)', [userName]);
-    const inscripcionesPorStatus = await pool.query('SELECT EstatusInsc, COUNT(*) AS total FROM Leads LEFT JOIN Promotor PromotorAct ON leads.promotorActual = PromotorAct.PromotorID LEFT JOIN users ON PromotorAct.PromotorID = users.promotorId WHERE users.userName = ? GROUP BY EstatusInsc;', [userName]);
-    const totalPorGrado = await pool.query('SELECT Grado, COUNT(*) AS total FROM Leads WHERE user.userName = ? GROUP BY Grado', [userName]);
-    const totalPorBeca = await pool.query('SELECT BecaOfrecida, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY BecaOfrecida', [userName]);
-    const totalPorPais = await pool.query('SELECT NombrePais, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY NombrePais', [userName]);
-    const totalPorEstado = await pool.query('SELECT NombreEstado, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY NombreEstado', [userName]);
-    const totalPorMunicipio = await pool.query('SELECT NombreCiudad, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY NombreCiudad', [userName]);
-    const totalPorCiclo = await pool.query('SELECT Ciclo, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY Ciclo', [userName]);
-    const totalPorPrograma = await pool.query('SELECT Programa, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY Programa', [userName]);
-    const totalPorSemestre = await pool.query('SELECT SemestreIngreso, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY SemestreIngreso', [userName]);
-    const totalPorReferido = await pool.query('SELECT TipoReferido, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY TipoReferido', [userName]);
-    const totalPorEscuela = await pool.query('SELECT EscuelaProcedencia, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY EscuelaProcedencia', [userName]);
-    const totalInscripcionesPorAnio = await pool.query('SELECT l.promotorActual AS PromotorID, MONTH(l.FechaPrimerContacto) AS mes, YEAR(l.FechaPrimerContacto) AS anio, COUNT(*) AS cantidad_registros FROM Leads l JOIN Promotor p ON l.promotorActual = p.PromotorID WHERE p.PromotorID = ? GROUP BY PromotorID, mes, anio', [userName]);
-    const totalInscripcionesPorMes = await pool.query('SELECT YEAR(FechaInscripcion) AS anio, MONTH(FechaInscripcion) AS mes, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY YEAR(FechaInscripcion), MONTH(FechaInscripcion)', [userName]);
-    const totalDondeObtDato = await pool.query('SELECT DondeObtDato, COUNT(*) AS total FROM Leads WHERE u.userName = ? GROUP BY DondeObtDato', [userName]);
+    const inscripcionesPorProm = await pool.query(
+      "SELECT p.Nombre AS PromotorNombre, l.promotorActual AS PromotorID, l.Grado, COUNT(*) AS total FROM Leads l JOIN Promotor p ON l.promotorActual = p.PromotorID WHERE p.Nombre = ? GROUP BY l.promotorActual, l.Grado",
+        [userName]
+    );
+
+    const pseguimientoProm = await pool.query(
+"SELECT PSeguimiento, COUNT(*) AS total FROM Leads l JOIN Promotor p ON l.promotorActual = p.PromotorID JOIN users u ON p.PromotorID = u.promotorId WHERE u.userName = ? GROUP BY PSeguimiento",
+[userName]
+    );
+
+    const totalPorCicloProm = await pool.query(
+      "SELECT l.Ciclo, COUNT(*) AS total FROM Leads l JOIN users u ON l.promotorActual = u.promotorId WHERE u.userName = ? GROUP BY l.Ciclo",
+      [userName]
+    );
+
+    const totalPorPaisProm = await pool.query(
+      "SELECT l.NombrePais, COUNT(*) AS total FROM Leads l JOIN users u ON l.promotorActual = u.promotorId WHERE u.userName = ? GROUP BY l.NombrePais",
+        [userName]
+    );
+
+    const totalPorEstadoProm = await pool.query(
+      "SELECT l.NombreEstado, COUNT(*) AS total FROM Leads l JOIN users u ON l.promotorActual = u.promotorId WHERE u.userName = ? GROUP BY l.NombreEstado",
+[userName]
+    );
+
+    const totalPorCiudadProm = await pool.query(
+      "SELECT l.NombreCiudad, COUNT(*) AS total FROM Leads l JOIN users u ON l.promotorActual = u.promotorId WHERE u.userName = ? GROUP BY l.NombreCiudad",
+[userName]
+    );
 
 
+
+    const totalPorMesAnioProm = await pool.query(
+      "SELECT YEAR(l.FechaInscripcion) AS anio, MONTH(l.FechaInscripcion) AS mes, COUNT(*) AS total FROM Leads l JOIN users u ON l.promotorActual = u.promotorId WHERE u.userName = ? GROUP BY YEAR(l.FechaInscripcion), MONTH(l.FechaInscripcion)",
+      [userName]
+    );
+
+    const totalPorEscProdProm = await pool.query(
+      "SELECT l.EscuelaProcedencia, COUNT(*) AS total FROM Leads l JOIN users u ON l.promotorActual = u.promotorId WHERE u.userName = ? GROUP BY l.EscuelaProcedencia",
+      [userName]
+    );
+
+    const totalPorEdadesProm = await pool.query(
+      "SELECT YEAR(CURDATE()) - YEAR(FechaNac) AS Edad, COUNT(*) AS total FROM Leads l JOIN users u ON l.promotorActual = u.promotorId WHERE u.userName = ? GROUP BY Edad",
+    [userName]
+    );
+
+    const totalPorBecaProm = await pool.query(
+      "SELECT l.BecaOfrecida, COUNT(*) AS total FROM Leads l JOIN users u ON l.promotorActual = u.promotorId WHERE u.userName = ? GROUP BY l.BecaOfrecida",
+      [userName]
+    );
+
+    const totalPorReferidoProm = await pool.query(
+    "SELECT l.TipoReferido, l.NombreReferido, COUNT(*) AS total FROM Leads l JOIN users u ON l.promotorActual = u.promotorId WHERE u.userName = ? GROUP BY l.TipoReferido, l.NombreReferido",
+    [userName]
+    );
+
+    const totalPorMedioContactoProm = await pool.query(
+    "SELECT m.Nombre AS MedioContacto, COUNT(*) AS total FROM Leads l JOIN MedioDeContacto m ON l.MedioDeContactoID = m.MedioID JOIN users u ON l.promotorActual = u.promotorId WHERE u.userName = ? GROUP BY m.Nombre",
+    [userName]
+
+    );
+
+
+    //edades, referidos, % becas, medio contacto 
+
+    
 
     // Construir un objeto de respuesta con todas las consultas
     const response = {
-      inscripcionesPorPromotor,
-      inscripcionesPorEdad,
-      inscripcionesPorStatus,
-      totalPorGrado,
-      totalPorBeca,
-      totalPorPais,
-      totalPorEstado,
-      totalPorMunicipio,
-      totalPorCiclo,
-      totalPorPrograma,
-      totalPorSemestre,
-      totalPorReferido,
-      totalPorEscuela,
-      totalInscripcionesPorAnio,
-      totalInscripcionesPorMes,
-      totalDondeObtDato,
+      inscripcionesPorProm,
+      pseguimientoProm,
+      totalPorCicloProm,
+      totalPorPaisProm,
+      totalPorEstadoProm,
+      totalPorCiudadProm,
+      totalPorMesAnioProm,
+      totalPorEscProdProm,
+      totalPorEdadesProm,
+      totalPorBecaProm,
+      totalPorReferidoProm,
+      totalPorMedioContactoProm,
+      
+
     };
 
     res.json({
       status: 200,
-      message: 'Datos para las gráficas obtenidos correctamente',
+      message: "Datos para las gráficas obtenidos correctamente",
       data: response,
     });
   } catch (error) {
-    console.error('Error al obtener datos para las gráficas:', error);
-    res.status(500).json({ error: 'Error en el servidor' });
+    console.error("Error al obtener datos para las gráficas:", error);
+    res.status(500).json({ error: "Error en el servidor" });
   }
 });
 

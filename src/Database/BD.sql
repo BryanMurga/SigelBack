@@ -16,7 +16,10 @@ CREATE TABLE Promotor (
 CREATE TABLE Campana (
     CampanaID INT AUTO_INCREMENT PRIMARY KEY,
     TipoCamp VARCHAR(255),
-    Nombre VARCHAR(255)
+    Nombre VARCHAR(255),
+    FechaInicio DATE,
+    FechaFin DATE
+    
 );
 
 -- Crear la tabla "MedioDeContacto"
@@ -471,55 +474,3 @@ BEGIN
 END;
 //
 DELIMITER ;
-
-
-
--- Select de los leads
-SELECT leads.NombreCompleto, leads.telefono,leads.telefono2, leads.CorreoElectronico, leads.CorreoElectronico2, leads.FechaPrimerContacto,
-leads.FechaNac, leads.EscuelaProcedencia, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.PSeguimiento, leads.Grado,
-leads.EstatusInsc,leads.SemestreIngreso, leads.Ciclo, leads.AsetNameForm, leads.IsOrganic, leads.TipoReferido, leads.NombreReferido, leads.DondeObtDato, 
-leads.FechaInscripcion, leads.BecaOfrecida, leads.NumeroLista, leads.FechaPromotorOriginal, leads.FechaPromotorActual, leads.Comentarios, 
-CarrerasInt.Nombre as CarreraInteres,  Campana.Nombre as NombreCampana, MedioDeContacto.Nombre as MedioContacto, CarreraIns.Nombre as CarreraInscrita, PromotorOri.Nombre as NombrePromotorOri, PromotorAct.Nombre as NombrePromotorAct 
-from leads
-LEFT JOIN Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID
-LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID
-LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID
-LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID
-LEFT JOIN Promotor PromotorOri ON leads.promotorOriginal = PromotorOri.PromotorID
-LEFT JOIN Promotor PromotorAct ON leads.promotorActual = PromotorAct.PromotorID;
-
-select leads.NombreCompleto, contacto.FechaContacto, contacto.Comentario from Contacto left join leads on Contacto.LeadID = leads.LeadID where Contacto.LeadID = 2;
-
-select * from reasignaciones;
-use apis4;
-SELECT Promotor.PromotorID, Promotor.Nombre FROM Promotor LEFT JOIN leads ON Promotor.PromotorID = leads.promotorActual AND leads.LeadID = 3 WHERE promotor.Estado = 1 and leads.promotorActual IS NULL;
-
-select * from promotor where estado = 1;
-
-select NombrePromotor, FechaReasignacion from Reasignaciones where LeadID = 1;
-
-SELECT leads.LeadID, leads.NombreCompleto, leads.telefono,leads.telefono2, leads.CorreoElectronico, leads.CorreoElectronico2, leads.FechaPrimerContacto,leads.FechaNac, leads.EscuelaProcedencia, leads.NombrePais, leads.NombreEstado, leads.NombreCiudad, leads.PSeguimiento, leads.Grado,leads.EstatusInsc,leads.SemestreIngreso, leads.Ciclo, leads.AsetNameForm, leads.IsOrganic, leads.TipoReferido, leads.NombreReferido, leads.DondeObtDato, leads.FechaInscripcion, leads.BecaOfrecida, leads.NumeroLista, leads.FechaPromotorOriginal, leads.FechaPromotorActual, leads.Comentarios, leads.Programa, leads.FechaPromotorOriginal, CarrerasInt.Nombre as CarreraInteres,  Campana.Nombre as NombreCampana, MedioDeContacto.Nombre as MedioContacto, CarreraIns.Nombre as CarreraInscrita, PromotorOri.Nombre as NombrePromotorOri, PromotorAct.Nombre as NombrePromotorAct from leads LEFT JOIN Carreras CarrerasInt ON leads.carreraInteresID = CarrerasInt.CarreraID LEFT JOIN Campana ON leads.CampanaID = Campana.CampanaID LEFT JOIN MedioDeContacto ON leads.MedioDeContactoID = MedioDeContacto.MedioID LEFT JOIN Carreras CarreraIns ON leads.CarreraInscripcion = CarreraIns.CarreraID LEFT JOIN Promotor PromotorOri ON leads.promotorOriginal = PromotorOri.PromotorID LEFT JOIN Promotor PromotorAct ON leads.promotorActual = PromotorAct.PromotorID where datediff(curdate(), leads.FechaPromotorActual) >=3 AND FechaPrimerContacto IS NULL and promotorOriginal IS NOT NULL;
-
-	DELIMITER //
-
--- Insert de las carreras
-
-SELECT
-        leads.LeadID,
-        leads.NombreCompleto,
-        leads.telefono,
-        leads.telefono2,
-        leads.CorreoElectronico,
-        leads.CorreoElectronico2,
-        leads.FechaPrimerContacto,
-        leads.promotorActual,
-        PromotorAct.Nombre as NombrePromotorAct
-      FROM
-        leads
-      LEFT JOIN
-        Promotor PromotorAct ON leads.promotorActual = PromotorAct.PromotorID
-      LEFT JOIN
-        users ON PromotorAct.PromotorID = users.promotorId
-      WHERE
-        users.userName = 'Bryan Murga';
-
