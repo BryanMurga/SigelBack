@@ -44,6 +44,7 @@ app.use('/carrera', require('./routes/carrera.js'));
 app.use('/funciones', require('./routes/funciones.js'));
 app.use('/cargar-archivo', require('./routes/cargarArchivo.js'))
 app.use('/graficas', require('./routes/inscripcionesRoutes.js'))
+app.use('/reportes', require('./routes/reportes.js'));
 
 
 app.use(require('./routes/index.js'));
