@@ -22,14 +22,14 @@ router.get('/:id', async (req, res) => {
   const { id } = req.params;
 
   try {
-    const contactoAlumno = await pool.query('SELECT * FROM ContactoAlumno WHERE ContactoAlumnoID = ?', [id]);
+    const contactoAlumno = await pool.query('SELECT * FROM ContactoAlumno WHERE alumnoID = ?', [id]);
     if (contactoAlumno.length === 0) {
       return res.status(404).json({ error: 'Contacto de alumno no encontrado' });
     }
     res.json({
       status: 200,
       message: 'Se ha obtenido el contacto de alumno correctamente',
-      contactoAlumno: contactoAlumno[0],
+      contactoAlumno: contactoAlumno,
     });
   } catch (error) {
     console.error('Error al obtener el contacto de alumno:', error);
@@ -39,16 +39,16 @@ router.get('/:id', async (req, res) => {
 
 // Crear un nuevo contacto de alumno
 router.post('/create', async (req, res) => {
-  const { FechaContacto, Comentario } = req.body;
+  const { alumnoID, Comentario } = req.body;
 
-  if (!FechaContacto || !Comentario) {
+  if ( !alumnoID || !Comentario) {
     return res.status(400).json({ error: 'Todos los campos obligatorios deben estar presentes' });
   }
 
-  const query = 'INSERT INTO ContactoAlumno (FechaContacto, Comentario) VALUES (?, ?)';
+  const query = 'INSERT INTO ContactoAlumno (alumnoID, FechaContacto, Comentario) VALUES (?, CURRENT_DATE, ?)';
 
   try {
-    const result = await pool.query(query, [FechaContacto, Comentario]);
+    const result = await pool.query(query, [alumnoID, Comentario]);
     res.json({ status: 200, message: 'Contacto de alumno creado exitosamente', insertedId: result.insertId });
   } catch (error) {
     console.error('Error al crear el contacto de alumno:', error);
