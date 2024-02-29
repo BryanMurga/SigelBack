@@ -16,10 +16,7 @@ CREATE TABLE Promotor (
 CREATE TABLE Campana (
     CampanaID INT AUTO_INCREMENT PRIMARY KEY,
     TipoCamp VARCHAR(255),
-    Nombre VARCHAR(255),
-    FechaInicio DATE,
-    FechaFin DATE
-    
+    Nombre VARCHAR(255)
 );
 
 -- Crear la tabla "MedioDeContacto"
@@ -31,6 +28,7 @@ CREATE TABLE MedioDeContacto (
 -- Crear la tabla "ContactoAlumno"
 CREATE TABLE ContactoAlumno(
     ContactoAlumnoID INT PRIMARY KEY AUTO_INCREMENT,
+    alumnoID INT,
     FechaContacto DATE,
     Comentario VARCHAR(255)
 );
@@ -203,7 +201,33 @@ CREATE TABLE leadxmes_promotor (
     cantidad_registros INT
 );
 
+-- Tablas Pivote
 
+CREATE TABLE IF NOT EXISTS lead_contacto (
+    lead_contactoID INT AUTO_INCREMENT PRIMARY KEY,
+    contacto_ContactoID INT,
+    leads_LeadID INT,
+    FOREIGN KEY (contacto_ContactoID) REFERENCES contacto(ContactoID),
+    FOREIGN KEY (leads_LeadID) REFERENCES leads(LeadID)
+) ENGINE = InnoDB;
+
+CREATE TABLE IF NOT EXISTS alumno_contacto (
+    alumno_contactoID INT AUTO_INCREMENT PRIMARY KEY,
+    alumnos_AlumnoID INT,
+    contacto_ContactoID INT,
+    INDEX fk_alumno_contacto_alumnos1_idx (alumnos_AlumnoID ASC),
+    INDEX fk_alumno_contacto_contacto1_idx (contacto_ContactoID ASC),
+    CONSTRAINT fk_alumno_contacto_alumnos1
+        FOREIGN KEY (alumnos_AlumnoID)
+        REFERENCES alumnos (AlumnoID)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION,
+    CONSTRAINT fk_alumno_contacto_contacto1
+        FOREIGN KEY (contacto_ContactoID)
+        REFERENCES contacto (ContactoID)
+        ON DELETE NO ACTION
+        ON UPDATE NO ACTION
+) ENGINE = InnoDB;
 
 INSERT INTO carreras (CarreraID, Nombre)
 VALUES
